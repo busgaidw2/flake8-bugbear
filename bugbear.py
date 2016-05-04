@@ -6,7 +6,7 @@ import attr
 import pep8
 
 
-__version__ = '16.4.0'
+__version__ = '16.4.2'
 
 
 @attr.s
@@ -57,6 +57,7 @@ class BugBearVisitor(ast.NodeVisitor):
     lines = attr.ib()
     node_stack = attr.ib(default=attr.Factory(list))
     errors = attr.ib(default=attr.Factory(list))
+    futures = attr.ib(default=attr.Factory(set))
 
     if False:
         # Useful for tracing what the hell is going on.
@@ -75,6 +76,7 @@ class BugBearVisitor(ast.NodeVisitor):
             self.errors.append(
                 B001(node.lineno, node.col_offset)
             )
+        self.generic_visit(node)
 
 
 error = namedtuple('error', 'lineno col message type')
@@ -86,4 +88,3 @@ B001 = partial(
             "be explicit and write `except BaseException:`.",
     type=BugBearChecker,
 )
-

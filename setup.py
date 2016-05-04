@@ -7,18 +7,15 @@ from setuptools import setup
 
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
-ld_file = open(os.path.join(current_dir, 'README.rst'))
-try:
+with open(os.path.join(current_dir, 'README.rst'), encoding='utf8') as ld_file:
     long_description = ld_file.read()
-finally:
-    ld_file.close()
 
 
 _version_re = re.compile(r'__version__\s+=\s+(?P<version>.*)')
 
 
-with open('bugbear.py', 'rb') as f:
-    version = _version_re.search(f.read().decode('utf-8')).group('version')
+with open(os.path.join(current_dir, 'bugbear.py'), 'r') as f:
+    version = _version_re.search(f.read()).group('version')
     version = str(ast.literal_eval(version))
 
 
