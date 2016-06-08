@@ -6,7 +6,7 @@ import attr
 import pep8
 
 
-__version__ = '16.4.2'
+__version__ = '16.6.0'
 
 
 @attr.s
@@ -56,8 +56,11 @@ class BugBearVisitor(ast.NodeVisitor):
     filename = attr.ib()
     lines = attr.ib()
     node_stack = attr.ib(default=attr.Factory(list))
+    node_window = attr.ib(default=attr.Factory(list))
     errors = attr.ib(default=attr.Factory(list))
     futures = attr.ib(default=attr.Factory(set))
+
+    NODE_WINDOW_SIZE = 4
 
     if False:
         # Useful for tracing what the hell is going on.
@@ -68,6 +71,8 @@ class BugBearVisitor(ast.NodeVisitor):
 
     def visit(self, node):
         self.node_stack.append(node)
+        self.node_window.append(node)
+        self.node_window = self.node_window[-self.NODE_WINDOW_SIZE:]
         super().visit(node)
         self.node_stack.pop()
 
@@ -78,8 +83,53 @@ class BugBearVisitor(ast.NodeVisitor):
             )
         self.generic_visit(node)
 
+    def visit_UAdd(self, node):
+        trailing_nodes = list(map(type, self.node_window[-4:]))
+        if trailing_nodes == [ast.UnaryOp, ast.UAdd, ast.UnaryOp, ast.UAdd]:
+            originator = self.node_window[-4]
+            self.errors.append(
+                B002(originator.lineno, originator.col_offset)
+            )
+        self.generic_visit(node)
+
+    def visit_Call(self, node):
+        if isinstance(node.func, ast.Attribute):
+            for bug in (B301, B302, B305):
+                if node.func.attr in bug.methods:
+                    call_path = '.'.join(self.compose_call_path(node.func.value))
+                    if call_path not in bug.valid_paths:
+                        self.errors.append(
+                            bug(node.lineno, node.col_offset)
+                        )
+                    break
+        self.generic_visit(node)
+
+    def visit_Attribute(self, node):
+        path = '.'.join(self.compose_call_path(node))
+        if path == 'sys.maxint':
+            self.errors.append(
+                B304(node.lineno, node.col_offset)
+            )
+
+    def visit_Assign(self, node):
+        if isinstance(self.node_stack[-2], ast.ClassDef):
+            assign_targets = {t.id for t in node.targets}
+            if '__metaclass__' in assign_targets:
+                self.errors.append(
+                    B303(node.lineno, node.col_offset)
+                )
+        self.generic_visit(node)
+
+    def compose_call_path(self, node):
+        if isinstance(node, ast.Attribute):
+            yield from self.compose_call_path(node.value)
+            yield node.attr
+        elif isinstance(node, ast.Name):
+            yield node.id
+
 
 error = namedtuple('error', 'lineno col message type')
+
 B001 = partial(
     error,
     message="B001: Do not use bare `except:`, it also catches unexpected "
@@ -88,3 +138,59 @@ B001 = partial(
             "be explicit and write `except BaseException:`.",
     type=BugBearChecker,
 )
+
+B002 = partial(
+    error,
+    message="B002: Python does not support the unary prefix increment. Writing "
+            "++n is equivalent to +(+(n)), which equals n. You meant n += 1.",
+    type=BugBearChecker,
+)
+
+# Those could be false positives but it's more dangerous to let them slip
+# through if they're not.
+B301 = partial(
+    error,
+    message="B301: Python 3 does not include .iter* methods on dictionaries. "
+            "Remove the ``iter`` prefix from the method name. For Python 2 "
+            "compatibility, prefer the Python 3 equivalent unless you expect "
+            "the size of the container to be large or unbounded. Then use "
+            "`six.iter*` or `future.utils.iter*`.",
+    type=BugBearChecker,
+)
+B301.methods = {'iterkeys', 'itervalues', 'iteritems', 'iterlists'}
+B301.valid_paths = {'six', 'future.utils', 'builtins'}
+
+B302 = partial(
+    error,
+    message="B302: Python 3 does not include .view* methods on dictionaries. "
+            "Remove the ``view`` prefix from the method name. For Python 2 "
+            "compatibility, prefer the Python 3 equivalent unless you expect "
+            "the size of the container to be large or unbounded. Then use "
+            "`six.view*` or `future.utils.view*`.",
+    type=BugBearChecker,
+)
+B302.methods = {'viewkeys', 'viewvalues', 'viewitems', 'viewlists'}
+B302.valid_paths = {'six', 'future.utils', 'builtins'}
+
+B303 = partial(
+    error,
+    message="B303: __metaclass__ does nothing on Python 3. Use "
+            "`class MyClass(BaseClass, metaclass=...)`. For Python 2 "
+            "compatibility, use `six.add_metaclass`.",
+    type=BugBearChecker,
+)
+
+B304 = partial(
+    error,
+    message="B304: sys.maxint is not a thing on Python 3. Use `sys.maxsize`.",
+    type=BugBearChecker,
+)
+
+B305 = partial(
+    error,
+    message="B305: .next() is not a thing on Python 3. Use the `next()` "
+            "builtin. For Python 2 compatibility, use ``six.next()``.",
+    type=BugBearChecker,
+)
+B305.methods = {'next'}
+B305.valid_paths = {'six', 'future.utils', 'builtins'}

@@ -19,13 +19,49 @@ program.  Contains warnings that don't belong in pyflakes and pep8::
 List of warnings
 ----------------
 
-B001
-~~~~
-
-Do not use bare ``except:``, it also catches unexpected events like
-memory errors, interrupts, system exit, and so on.  Prefer ``except
+**B001**: Do not use bare ``except:``, it also catches unexpected events
+like memory errors, interrupts, system exit, and so on.  Prefer ``except
 Exception:``.  If you're sure what you're doing, be explicit and write
 ``except BaseException:``.
+
+**B002**: Python does not support the unary prefix increment. Writing
+``++n`` is equivalent to ``+(+(n))``, which equals ``n``. You meant ``n
++= 1``.
+
+Python 3 compatibility warnings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+These have higher risk of false positives but discover regressions that
+are dangerous to slip through when test coverage is not great. Let me
+know if a popular library is triggering any of the following warnings
+for valid code.
+
+**B301**: Python 3 does not include ``.iter*`` methods on dictionaries.
+The default behavior is to return iterables. Simply remove the ``iter``
+prefix from the method.  For Python 2 compatibility, also prefer the
+Python 3 equivalent if you expect that the size of the dict to be small
+and bounded. The performance regression on Python 2 will be negligible
+and the code is going to be the clearest.  Alternatively, use
+``six.iter*`` or ``future.utils.iter*``.
+
+**B302**: Python 3 does not include ``.view*`` methods on dictionaries.
+The default behavior is to return viewables. Simply remove the ``view``
+prefix from the method.  For Python 2 compatibility, also prefer the
+Python 3 equivalent if you expect that the size of the dict to be small
+and bounded. The performance regression on Python 2 will be negligible
+and the code is going to be the clearest.  Alternatively, use
+``six.view*`` or ``future.utils.view*``.
+
+**B303**: The ``__metaclass__`` attribute on a class definition does
+nothing on Python 3. Use ``class MyClass(BaseClass, metaclass=...)``.
+For Python 2 compatibility, use ``six.add_metaclass``.
+
+**B304**: ``sys.maxint`` is not a thing on Python 3. Use
+``sys.maxsize``.
+
+**B305**: ``.next()`` is not a thing on Python 3. Use the ``next()``
+builtin. For Python 2 compatibility, use ``six.next()``.
+
 
 Tests
 -----
@@ -62,6 +98,11 @@ MIT
 
 Change Log
 ----------
+
+16.6.0
+~~~~~~
+
+* introduced B002, B301, B302, B303, B304, and B305
 
 16.4.2
 ~~~~~~

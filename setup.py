@@ -48,7 +48,7 @@ setup(
     ],
     entry_points={
         'flake8.extension': [
-            'B00 = bugbear:BugBearChecker',
+            'B = bugbear:BugBearChecker',
         ],
     },
 )
