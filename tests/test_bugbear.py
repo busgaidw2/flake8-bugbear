@@ -43,7 +43,7 @@ class BugbearTestCase(unittest.TestCase):
         errors = list(bbc.run())
         self.assertEqual(
             errors,
-            [B303(21, 4), B304(28, 4)],
+            [B303(21, 4), B304(38, 4)],
         )
 
 

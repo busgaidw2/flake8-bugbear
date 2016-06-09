@@ -6,7 +6,7 @@ import attr
 import pep8
 
 
-__version__ = '16.6.0'
+__version__ = '16.6.1'
 
 
 @attr.s
@@ -113,7 +113,9 @@ class BugBearVisitor(ast.NodeVisitor):
 
     def visit_Assign(self, node):
         if isinstance(self.node_stack[-2], ast.ClassDef):
-            assign_targets = {t.id for t in node.targets}
+            # note: by hasattr belowe we're ignoring starred arguments, slices
+            # and tuples for simplicity.
+            assign_targets = {t.id for t in node.targets if hasattr(t, 'id')}
             if '__metaclass__' in assign_targets:
                 self.errors.append(
                     B303(node.lineno, node.col_offset)

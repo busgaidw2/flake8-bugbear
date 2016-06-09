@@ -99,6 +99,11 @@ MIT
 Change Log
 ----------
 
+16.6.1
+~~~~~~
+
+* bugfix: don't crash on files with tuple unpacking in class bodies
+
 16.6.0
 ~~~~~~
 
