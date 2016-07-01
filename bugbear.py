@@ -3,10 +3,10 @@ from collections import namedtuple
 from functools import partial
 
 import attr
-import pep8
+import pycodestyle
 
 
-__version__ = '16.6.1'
+__version__ = '16.7.1'
 
 
 @attr.s
@@ -29,7 +29,7 @@ class BugBearChecker(object):
         )
         visitor.visit(self.tree)
         for e in visitor.errors:
-            if pep8.noqa(self.lines[e.lineno - 1]):
+            if pycodestyle.noqa(self.lines[e.lineno - 1]):
                 continue
 
             yield e
@@ -43,9 +43,9 @@ class BugBearChecker(object):
 
         if self.filename in ("stdin", "-", None):
             self.filename = "stdin"
-            self.lines = pep8.stdin_get_value().splitlines(True)
+            self.lines = pycodestyle.stdin_get_value().splitlines(True)
         else:
-            self.lines = pep8.readlines(self.filename)
+            self.lines = pycodestyle.readlines(self.filename)
 
         if not self.tree:
             self.tree = ast.parse("".join(self.lines))
@@ -207,8 +207,8 @@ B305.valid_paths = {'six', 'future.utils', 'builtins'}
 
 B306 = partial(
     error,
-    message="``BaseException.message`` has been deprecated as of Python 2.6 "
-            "and is removed in Python 3. Use ``str(e)`` to access the "
+    message="B306: ``BaseException.message`` has been deprecated as of Python "
+            "2.6 and is removed in Python 3. Use ``str(e)`` to access the "
             "user-readable message. Use ``e.args`` to access arguments passed "
             "to the exception.",
     type=BugBearChecker,

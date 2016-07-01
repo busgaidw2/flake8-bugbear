@@ -3,7 +3,8 @@ flake8-bugbear
 ==============
 
 A plugin for flake8 finding likely bugs and design problems in your
-program.  Contains warnings that don't belong in pyflakes and pep8::
+program.  Contains warnings that don't belong in pyflakes and
+pycodestyle::
 
     bug·bear  (bŭg′bâr′)
     n.
@@ -104,6 +105,19 @@ MIT
 
 Change Log
 ----------
+
+16.7.1
+~~~~~~
+
+* bugfix: don't omit message code in B306's warning
+
+* change dependency on ``pep8`` to dependency on ``pycodestyle``, update
+  ``flake8`` constraint to at least 2.6.2
+
+16.7.0
+~~~~~~
+
+* introduced B306
 
 16.6.1
 ~~~~~~

@@ -24,7 +24,7 @@ setup(
     version=version,
     description="A plugin for flake8 finding likely bugs and design problems "
                 "in your program. Contains warnings that don't belong in "
-                "pyflakes and pep8.",
+                "pyflakes and pycodestyle.",
     long_description=long_description,
     keywords='flake8 bugbear bugs pyflakes pylint linter qa',
     author='Łukasz Langa',
@@ -33,7 +33,7 @@ setup(
     license='MIT',
     py_modules=['bugbear'],
     zip_safe=False,
-    install_requires = ['flake8', 'attrs'],
+    install_requires = ['flake8 >= 2.6.2', 'attrs'],
     test_suite='tests.test_bugbear',
     classifiers=[
         'Development Status :: 3 - Alpha',
