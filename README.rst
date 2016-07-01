@@ -16,6 +16,7 @@ program.  Contains warnings that don't belong in pyflakes and pep8::
     3. A fearsome imaginary creature, especially one evoked to frighten
        children.
 
+
 List of warnings
 ----------------
 
@@ -62,6 +63,10 @@ For Python 2 compatibility, use ``six.add_metaclass``.
 **B305**: ``.next()`` is not a thing on Python 3. Use the ``next()``
 builtin. For Python 2 compatibility, use ``six.next()``.
 
+**B306**: ``BaseException.message`` has been deprecated as of Python 2.6
+and is removed in Python 3. Use ``str(e)`` to access the user-readable
+message. Use ``e.args`` to access arguments passed to the exception.
+
 
 Tests
 -----
@@ -89,6 +94,7 @@ By making the code exclusively Python 3.5+, I'm able to focus on the
 quality of the checks and re-use all the nice features of the new
 releases (check out `pathlib <docs.python.org/3/library/pathlib.html>`_)
 instead of wasting cycles on Unicode compatiblity, etc.
+
 
 License
 -------

@@ -105,11 +105,19 @@ class BugBearVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_Attribute(self, node):
-        path = '.'.join(self.compose_call_path(node))
-        if path == 'sys.maxint':
+        call_path = list(self.compose_call_path(node))
+        if '.'.join(call_path) == 'sys.maxint':
             self.errors.append(
                 B304(node.lineno, node.col_offset)
             )
+        elif len(call_path) == 2 and call_path[1] == 'message':
+            name = call_path[0]
+            for elem in reversed(self.node_stack[:-1]):
+                if isinstance(elem, ast.ExceptHandler) and elem.name == name:
+                    self.errors.append(
+                        B306(node.lineno, node.col_offset)
+                    )
+                    break
 
     def visit_Assign(self, node):
         if isinstance(self.node_stack[-2], ast.ClassDef):
@@ -196,3 +204,12 @@ B305 = partial(
 )
 B305.methods = {'next'}
 B305.valid_paths = {'six', 'future.utils', 'builtins'}
+
+B306 = partial(
+    error,
+    message="``BaseException.message`` has been deprecated as of Python 2.6 "
+            "and is removed in Python 3. Use ``str(e)`` to access the "
+            "user-readable message. Use ``e.args`` to access arguments passed "
+            "to the exception.",
+    type=BugBearChecker,
+)
