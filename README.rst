@@ -30,6 +30,12 @@ Exception:``.  If you're sure what you're doing, be explicit and write
 ``++n`` is equivalent to ``+(+(n))``, which equals ``n``. You meant ``n
 += 1``.
 
+**B003**: Assigning to ``os.environ`` doesn't clear the
+environment.  Subprocesses are going to see outdated
+variables, in disagreement with the current process.  Use
+``os.environ.clear()`` or the ``env=``  argument to Popen.
+
+
 Python 3 compatibility warnings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -105,6 +111,11 @@ MIT
 
 Change Log
 ----------
+
+16.9.0
+~~~~~~
+
+* introduced B003
 
 16.7.1
 ~~~~~~

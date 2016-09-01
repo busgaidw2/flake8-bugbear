@@ -6,7 +6,7 @@ import attr
 import pycodestyle
 
 
-__version__ = '16.7.1'
+__version__ = '16.9.0'
 
 
 @attr.s
@@ -128,6 +128,13 @@ class BugBearVisitor(ast.NodeVisitor):
                 self.errors.append(
                     B303(node.lineno, node.col_offset)
                 )
+        elif len(node.targets) == 1:
+            t = node.targets[0]
+            if isinstance(t, ast.Attribute) and isinstance(t.value, ast.Name):
+                if (t.value.id, t.attr) == ('os', 'environ'):
+                    self.errors.append(
+                        B003(node.lineno, node.col_offset)
+                    )
         self.generic_visit(node)
 
     def compose_call_path(self, node):
@@ -153,6 +160,15 @@ B002 = partial(
     error,
     message="B002: Python does not support the unary prefix increment. Writing "
             "++n is equivalent to +(+(n)), which equals n. You meant n += 1.",
+    type=BugBearChecker,
+)
+
+B003 = partial(
+    error,
+    message="B003: Assigning to `os.environ` doesn't clear the environment. "
+            "Subprocesses are going to see outdated variables, in disagreement "
+            "with the current process. Use `os.environ.clear()` or the `env=` "
+            "argument to Popen.",
     type=BugBearChecker,
 )
 
