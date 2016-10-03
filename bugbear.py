@@ -1,5 +1,6 @@
 import ast
 from collections import namedtuple
+from contextlib import suppress
 from functools import partial
 
 import attr
@@ -52,6 +53,7 @@ class BugBearChecker(object):
 
     @staticmethod
     def add_options(optmanager):
+        """Informs flake8 to ignore B9xx by default."""
         optmanager.extend_default_ignore(disabled_by_default)
 
 
@@ -106,6 +108,16 @@ class BugBearVisitor(ast.NodeVisitor):
                             bug(node.lineno, node.col_offset)
                         )
                     break
+        else:
+            with suppress(AttributeError, IndexError):
+                if (
+                    node.func.id in ('getattr', 'hasattr') and
+                    node.args[1].s == '__call__'
+                ):
+                    self.errors.append(
+                        B004(node.lineno, node.col_offset)
+                    )
+
         self.generic_visit(node)
 
     def visit_Attribute(self, node):
@@ -197,12 +209,21 @@ B003 = partial(
     type=BugBearChecker,
 )
 
+B004 = partial(
+    error,
+    message="B004: Using `hasattr(x, '__call__')` to test if `x` is callable "
+            "is unreliable. If `x` implements custom `__getattr__` or its "
+            "`__call__` is itself not callable, you might get misleading "
+            "results. Use `callable(x)` for consistent results.",
+    type=BugBearChecker,
+)
+
 # Those could be false positives but it's more dangerous to let them slip
 # through if they're not.
 B301 = partial(
     error,
-    message="B301: Python 3 does not include .iter* methods on dictionaries. "
-            "Remove the ``iter`` prefix from the method name. For Python 2 "
+    message="B301: Python 3 does not include `.iter*` methods on dictionaries. "
+            "Remove the `iter` prefix from the method name. For Python 2 "
             "compatibility, prefer the Python 3 equivalent unless you expect "
             "the size of the container to be large or unbounded. Then use "
             "`six.iter*` or `future.utils.iter*`.",
@@ -213,8 +234,8 @@ B301.valid_paths = {'six', 'future.utils', 'builtins'}
 
 B302 = partial(
     error,
-    message="B302: Python 3 does not include .view* methods on dictionaries. "
-            "Remove the ``view`` prefix from the method name. For Python 2 "
+    message="B302: Python 3 does not include `.view*` methods on dictionaries. "
+            "Remove the `view` prefix from the method name. For Python 2 "
             "compatibility, prefer the Python 3 equivalent unless you expect "
             "the size of the container to be large or unbounded. Then use "
             "`six.view*` or `future.utils.view*`.",
@@ -225,7 +246,7 @@ B302.valid_paths = {'six', 'future.utils', 'builtins'}
 
 B303 = partial(
     error,
-    message="B303: __metaclass__ does nothing on Python 3. Use "
+    message="B303: `__metaclass__` does nothing on Python 3. Use "
             "`class MyClass(BaseClass, metaclass=...)`. For Python 2 "
             "compatibility, use `six.add_metaclass`.",
     type=BugBearChecker,
@@ -233,14 +254,14 @@ B303 = partial(
 
 B304 = partial(
     error,
-    message="B304: sys.maxint is not a thing on Python 3. Use `sys.maxsize`.",
+    message="B304: `sys.maxint` is not a thing on Python 3. Use `sys.maxsize`.",
     type=BugBearChecker,
 )
 
 B305 = partial(
     error,
-    message="B305: .next() is not a thing on Python 3. Use the `next()` "
-            "builtin. For Python 2 compatibility, use ``six.next()``.",
+    message="B305: `.next()` is not a thing on Python 3. Use the `next()` "
+            "builtin. For Python 2 compatibility, use `six.next()`.",
     type=BugBearChecker,
 )
 B305.methods = {'next'}
@@ -248,17 +269,17 @@ B305.valid_paths = {'six', 'future.utils', 'builtins'}
 
 B306 = partial(
     error,
-    message="B306: ``BaseException.message`` has been deprecated as of Python "
-            "2.6 and is removed in Python 3. Use ``str(e)`` to access the "
-            "user-readable message. Use ``e.args`` to access arguments passed "
+    message="B306: `BaseException.message` has been deprecated as of Python "
+            "2.6 and is removed in Python 3. Use `str(e)` to access the "
+            "user-readable message. Use `e.args` to access arguments passed "
             "to the exception.",
     type=BugBearChecker,
 )
 
 B901 = partial(
     error,
-    message=("B901: Using ``yield`` together with ``return x``. Use native "
-             "``async def`` coroutines or put a ``# noqa`` comment on this "
+    message=("B901: Using `yield` together with `return x`. Use native "
+             "`async def` coroutines or put a `# noqa` comment on this "
              "line if this was intentional."),
     type=BugBearChecker,
 )

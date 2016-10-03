@@ -35,6 +35,11 @@ environment.  Subprocesses are going to see outdated
 variables, in disagreement with the current process.  Use
 ``os.environ.clear()`` or the ``env=``  argument to Popen.
 
+**B004**: Using ``hasattr(x, '__call__')`` to test if ``x`` is callable
+is unreliable.  If ``x`` implements custom ``__getattr__`` or its
+``__call__`` is itself not callable, you might get misleading
+results.  Use ``callable(x)`` for consistent results.
+
 
 Python 3 compatibility warnings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -146,6 +151,8 @@ Change Log
 
 16.10.0
 ~~~~~~~
+
+* introduced B004
 
 * introduced B901, thanks Markus!
 
