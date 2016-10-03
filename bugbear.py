@@ -6,7 +6,7 @@ import attr
 import pycodestyle
 
 
-__version__ = '16.9.0'
+__version__ = '16.10.0'
 
 
 @attr.s

@@ -38,7 +38,8 @@ def broken2():
 
 
 async def not_broken4():
-    yield 2
+    import asyncio
+    await asyncio.sleep(1)
     return 1
 
 

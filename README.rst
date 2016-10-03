@@ -78,15 +78,33 @@ message. Use ``e.args`` to access arguments passed to the exception.
 Opinionated warnings
 ~~~~~~~~~~~~~~~~~~~~
 
-Those warnings are disabled by default because the opinions they come from are
-controversial.
+The following warnings are disabled by default because they are controversial.
+They may or may not apply to you, enable them explicitly in your configuration
+if you find them useful.
 
-**B901**: Using ``return x`` in a generator function is syntactically invalid
-in Python 2, but in Python 3 ``return x`` in a generator function means ``raise
-StopIteration(x)``. Users that come from Python 2 may be used to Python 2
-rejecting code that mixes both, so this can lead to situations where it looks
-like ``return x`` makes the function generate an empty sequence. Use the more
-explicit ``raise StopIteration(x)`` instead of ``return x``.
+To enable these checks, specify a ``--select`` command-line option or
+``select=`` option in your config file.  As of Flake8 3.0, this option
+is a whitelist (checks not listed are being implicitly disabled), so you
+have to explicitly specify all checks you want enabled. For example::
+
+	[flake8]
+	max-line-length = 80
+	max-complexity = 12
+	...
+	select = C,E,F,W,B,B901
+
+Note that we're enabling the complexity checks, the PEP8 ``pycodestyle``
+errors and warnings, the pyflakes fatals and all default Bugbear checks.
+Finally, we're also specifying B901 as a check that we want enabled.  If
+you'd like all optional warnings to be enabled for you (future proof
+your config!), say ``B9`` instead of ``B901``.
+
+**B901**: Using ``return x`` in a generator function used to be syntactically
+invalid in Python 2. In Python 3 ``return x`` can be used in a generator as
+a return value in conjunction with ``yield from``.  Users coming from Python 2
+may expect the old behavior which might lead to bugs.  Use native ``async def``
+coroutines or mark intentional ``return x`` usage with ``# noqa`` on the same
+line.
 
 
 Tests
@@ -125,6 +143,13 @@ MIT
 
 Change Log
 ----------
+
+16.10.0
+~~~~~~~
+
+* introduced B901, thanks Markus!
+
+* update ``flake8`` constraint to at least 3.0.0
 
 16.9.0
 ~~~~~~
@@ -179,4 +204,5 @@ Change Log
 Authors
 -------
 
-Glued together by `Łukasz Langa <mailto:lukasz@langa.pl>`_.
+Glued together by `Łukasz Langa <mailto:lukasz@langa.pl>`_. Multiple
+improvements by `Markus Unterwaditzer <mailto:markus@unterwaditzer.net>`_.
