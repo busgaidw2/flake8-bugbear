@@ -50,6 +50,10 @@ class BugBearChecker(object):
         if not self.tree:
             self.tree = ast.parse("".join(self.lines))
 
+    @staticmethod
+    def add_options(optmanager):
+        optmanager.extend_default_ignore(disabled_by_default)
+
 
 @attr.s
 class BugBearVisitor(ast.NodeVisitor):
@@ -135,6 +139,27 @@ class BugBearVisitor(ast.NodeVisitor):
                     self.errors.append(
                         B003(node.lineno, node.col_offset)
                     )
+        self.generic_visit(node)
+
+    def visit_FunctionDef(self, node):
+        xs = list(node.body)
+        has_yield = False
+        return_node = None
+        while xs:
+            x = xs.pop()
+            if isinstance(x, (ast.Yield, ast.YieldFrom)):
+                has_yield = True
+            elif isinstance(x, ast.Return) and x.value is not None:
+                return_node = x
+
+            if has_yield and return_node is not None:
+                self.errors.append(
+                    B901(return_node.lineno, return_node.col_offset)
+                )
+                break
+
+            xs.extend(ast.iter_child_nodes(x))
+
         self.generic_visit(node)
 
     def compose_call_path(self, node):
@@ -229,3 +254,13 @@ B306 = partial(
             "to the exception.",
     type=BugBearChecker,
 )
+
+B901 = partial(
+    error,
+    message=("B901: Using ``yield`` together with ``return x``. Use native "
+             "``async def`` coroutines or put a ``# noqa`` comment on this "
+             "line if this was intentional."),
+    type=BugBearChecker,
+)
+
+disabled_by_default = ["B901"]
