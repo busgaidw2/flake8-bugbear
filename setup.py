@@ -4,6 +4,10 @@ import ast
 import os
 import re
 from setuptools import setup
+import sys
+
+
+assert sys.version_info >= (3, 5, 0), "bugbear requires Python 3.5+"
 
 
 current_dir = os.path.abspath(os.path.dirname(__file__))

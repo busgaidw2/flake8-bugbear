@@ -149,6 +149,14 @@ MIT
 Change Log
 ----------
 
+16.11.0
+~~~~~~~
+
+* bugfix: don't raise false positives in B901 on closures within
+  generators
+
+* gracefully fail on Python 2 in setup.py
+
 16.10.0
 ~~~~~~~
 
