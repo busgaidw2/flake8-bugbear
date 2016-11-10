@@ -7,7 +7,7 @@ import attr
 import pycodestyle
 
 
-__version__ = '16.11.0'
+__version__ = '16.11.1'
 
 
 @attr.s
@@ -108,6 +108,8 @@ class BugBearVisitor(ast.NodeVisitor):
                             bug(node.lineno, node.col_offset)
                         )
                     break
+            else:
+                self.check_for_b005(node)
         else:
             with suppress(AttributeError, IndexError):
                 if (
@@ -183,6 +185,28 @@ class BugBearVisitor(ast.NodeVisitor):
         elif isinstance(node, ast.Name):
             yield node.id
 
+    def check_for_b005(self, node):
+        if node.func.attr not in B005.methods:
+            return  # method name doesn't match
+
+        if len(node.args) != 1 or not isinstance(node.args[0], ast.Str):
+            return  # used arguments don't match the builtin strip
+
+        call_path = '.'.join(self.compose_call_path(node.func.value))
+        if call_path in B005.valid_paths:
+            return  # path is exempt
+
+        s = node.args[0].s
+        if len(s) == 1:
+            return  # stripping just one character
+
+        if len(s) == len(set(s)):
+            return  # no characters appear more than once
+
+        self.errors.append(
+            B005(node.lineno, node.col_offset)
+        )
+
 
 error = namedtuple('error', 'lineno col message type')
 
@@ -219,6 +243,17 @@ B004 = partial(
             "results. Use `callable(x)` for consistent results.",
     type=BugBearChecker,
 )
+
+B005 = partial(
+    error,
+    message="B005: Using .strip() with multi-character strings is misleading "
+            "the reader. It looks like stripping a substring. Move your "
+            "character set to a constant if this is deliberate. Use "
+            ".replace() or regular expressions to remove string fragments.",
+    type=BugBearChecker,
+)
+B005.methods = {'lstrip', 'rstrip', 'strip'}
+B005.valid_paths = {}
 
 # Those could be false positives but it's more dangerous to let them slip
 # through if they're not.

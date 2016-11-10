@@ -40,6 +40,11 @@ is unreliable.  If ``x`` implements custom ``__getattr__`` or its
 ``__call__`` is itself not callable, you might get misleading
 results.  Use ``callable(x)`` for consistent results.
 
+**B005**: Using ``.strip()`` with multi-character strings is misleading
+the reader. It looks like stripping a substring. Move your
+character set to a constant if this is deliberate. Use
+``.replace()`` or regular expressions to remove string fragments.
+
 
 Python 3 compatibility warnings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -148,6 +153,11 @@ MIT
 
 Change Log
 ----------
+
+16.11.1
+~~~~~~~
+
+* introduced B005
 
 16.11.0
 ~~~~~~~

@@ -7,6 +7,7 @@ from bugbear import (
     B002,
     B003,
     B004,
+    B005,
     B301,
     B302,
     B303,
@@ -15,6 +16,7 @@ from bugbear import (
     B306,
     B901,
 )
+
 
 class BugbearTestCase(unittest.TestCase):
     maxDiff = None
@@ -53,6 +55,16 @@ class BugbearTestCase(unittest.TestCase):
         self.assertEqual(
             errors,
             [B004(3, 7), B004(5, 7)],
+        )
+
+    def test_b005(self):
+        filename = Path(__file__).absolute().parent / 'b005.py'
+        bbc = BugBearChecker(filename=str(filename))
+        errors = list(bbc.run())
+        self.assertEqual(
+            errors,
+            [B005(4, 0), B005(7, 0), B005(10, 0), B005(13, 0), B005(16, 0),
+             B005(19, 0)],
         )
 
     def test_b301_b302_b305(self):
