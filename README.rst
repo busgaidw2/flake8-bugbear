@@ -116,7 +116,7 @@ line.
 
 **B950**: Line too long. This is a pragmatic equivalent of ``pycodestyle``'s
 E501: it considers "max-line-length" but only triggers when the value has been
-exceeded by **more than 110%**. You will no longer be forced to reformat code
+exceeded by **more than 10%**. You will no longer be forced to reformat code
 due to the closing parenthesis being one character too far to satisfy the
 linter. At the same time, if you do significantly violate the line length, you
 will receive a message that states what the actual limit is. This is inspired
