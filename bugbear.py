@@ -11,7 +11,7 @@ __version__ = '16.11.1'
 
 
 @attr.s
-class BugBearChecker(object):
+class BugBearChecker:
     name = 'flake8-bugbear'
     version = __version__
 
@@ -19,6 +19,7 @@ class BugBearChecker(object):
     filename = attr.ib(default='(none)')
     builtins = attr.ib(default=None)
     lines = attr.ib(default=None)
+    max_line_length = attr.ib(default=79)
     visitor = attr.ib(default=attr.Factory(lambda: BugBearVisitor))
 
     def run(self):
@@ -34,6 +35,19 @@ class BugBearChecker(object):
                 continue
 
             yield e
+        for lineno, line in enumerate(self.lines, start=1):
+            length = len(line) - 1
+            if length > 1.1 * self.max_line_length:
+                if pycodestyle.noqa(line):
+                    continue
+
+                yield B950(
+                    lineno,
+                    length,
+                    message='B950: line too long ({} > {} characters)'.format(
+                        length, self.max_line_length,
+                    ),
+                )
 
     def load_file(self):
         """Loads the file in a way that auto-detects source encoding and deals
@@ -318,6 +332,11 @@ B901 = partial(
     message=("B901: Using `yield` together with `return x`. Use native "
              "`async def` coroutines or put a `# noqa` comment on this "
              "line if this was intentional."),
+    type=BugBearChecker,
+)
+B950 = partial(
+    error,
+    message=("B950: line too long"),
     type=BugBearChecker,
 )
 

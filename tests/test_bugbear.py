@@ -15,6 +15,7 @@ from bugbear import (
     B305,
     B306,
     B901,
+    B950,
 )
 
 
@@ -103,6 +104,15 @@ class BugbearTestCase(unittest.TestCase):
         self.assertEqual(
             errors,
             [B901(8, 8), B901(35, 4)]
+        )
+
+    def test_b950(self):
+        filename = Path(__file__).absolute().parent / 'b950.py'
+        bbc = BugBearChecker(filename=str(filename))
+        errors = list(bbc.run())
+        self.assertEqual(
+            errors,
+            [B950(6, 87, message='B950: line too long (87 > 79 characters)')],
         )
 
 

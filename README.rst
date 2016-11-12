@@ -114,6 +114,17 @@ may expect the old behavior which might lead to bugs.  Use native ``async def``
 coroutines or mark intentional ``return x`` usage with ``# noqa`` on the same
 line.
 
+**B950**: Line too long. This is a pragmatic equivalent of ``pycodestyle``'s
+E501: it considers "max-line-length" but only triggers when the value has been
+exceeded by **more than 110%**. You will no longer be forced to reformat code
+due to the closing parenthesis being one character too far to satisfy the
+linter. At the same time, if you do significantly violate the line length, you
+will receive a message that states what the actual limit is. This is inspired
+by Raymond Hettinger's `"Beyond PEP 8" talk
+<https://www.youtube.com/watch?v=wf-BqAjZb8M>`_ and highway patrol not
+stopping you if you drive < 5mph too fast. Disable E501 to avoid duplicate
+warnings.
+
 
 Tests
 -----
@@ -156,6 +167,8 @@ Change Log
 ~~~~~~~
 
 * introduced B005
+
+* introduced B951
 
 16.11.0
 ~~~~~~~
