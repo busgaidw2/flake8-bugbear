@@ -340,4 +340,4 @@ B950 = partial(
     type=BugBearChecker,
 )
 
-disabled_by_default = ["B901"]
+disabled_by_default = ["B901", "B950"]
