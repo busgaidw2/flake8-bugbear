@@ -111,6 +111,10 @@ Note that we're enabling the complexity checks, the PEP8 ``pycodestyle``
 errors and warnings, the pyflakes fatals and all default Bugbear checks.
 Finally, we're also specifying B901 as a check that we want enabled.
 
+If you'd like all optional warnings to be enabled for you (future proof
+your config!), say ``B9`` instead of ``B901``. You will need flake8 3.2+
+for this feature.
+
 **B901**: Using ``return x`` in a generator function used to be syntactically
 invalid in Python 2. In Python 3 ``return x`` can be used in a generator as
 a return value in conjunction with ``yield from``.  Users coming from Python 2
