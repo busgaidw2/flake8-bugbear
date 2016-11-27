@@ -45,6 +45,10 @@ the reader. It looks like stripping a substring. Move your
 character set to a constant if this is deliberate. Use
 ``.replace()`` or regular expressions to remove string fragments.
 
+**B006**: Do not use mutable data structures for argument defaults.  All
+calls reuse one instance of that data structure, persisting changes
+between them.
+
 
 Python 3 compatibility warnings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -167,6 +171,8 @@ Change Log
 ~~~~~~~
 
 * introduced B005
+
+* introduced B006
 
 * introduced B951
 

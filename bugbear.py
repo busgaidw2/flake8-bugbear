@@ -190,6 +190,18 @@ class BugBearVisitor(ast.NodeVisitor):
 
             xs.extend(ast.iter_child_nodes(x))
 
+        for default in node.args.defaults:
+            if isinstance(default, B006.mutable_literals):
+                self.errors.append(
+                    B006(default.lineno, default.col_offset)
+                )
+            elif isinstance(default, ast.Call):
+                call_path = '.'.join(self.compose_call_path(default.func))
+                if call_path in B006.mutable_calls:
+                    self.errors.append(
+                        B006(default.lineno, default.col_offset)
+                    )
+
         self.generic_visit(node)
 
     def compose_call_path(self, node):
@@ -268,6 +280,28 @@ B005 = partial(
 )
 B005.methods = {'lstrip', 'rstrip', 'strip'}
 B005.valid_paths = {}
+
+B006 = partial(
+    error,
+    message="B006: Do not use mutable data structures for argument defaults. "
+            "All calls reuse one instance of that data structure, persisting "
+            "changes between them.",
+    type=BugBearChecker,
+)
+B006.mutable_literals = (ast.Dict, ast.List, ast.Set)
+B006.mutable_calls = {
+    'Counter',
+    'OrderedDict',
+    'collections.Counter',
+    'collections.OrderedDict',
+    'collections.defaultdict',
+    'collections.deque',
+    'defaultdict',
+    'deque',
+    'dict',
+    'list',
+    'set',
+}
 
 # Those could be false positives but it's more dangerous to let them slip
 # through if they're not.
