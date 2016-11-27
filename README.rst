@@ -174,7 +174,7 @@ Change Log
 
 * introduced B006
 
-* introduced B951
+* introduced B950
 
 16.11.0
 ~~~~~~~
