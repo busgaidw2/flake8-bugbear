@@ -171,6 +171,12 @@ MIT
 Change Log
 ----------
 
+16.12.0
+~~~~~~~
+
+* bugfix: remove an extra colon in error formatting that was making Bugbear
+  errors invisible in Syntastic
+
 16.11.1
 ~~~~~~~
 

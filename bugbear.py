@@ -238,7 +238,7 @@ error = namedtuple('error', 'lineno col message type')
 
 B001 = partial(
     error,
-    message="B001: Do not use bare `except:`, it also catches unexpected "
+    message="B001 Do not use bare `except:`, it also catches unexpected "
             "events like memory errors, interrupts, system exit, and so on.  "
             "Prefer `except Exception:`.  If you're sure what you're doing, "
             "be explicit and write `except BaseException:`.",
@@ -247,14 +247,14 @@ B001 = partial(
 
 B002 = partial(
     error,
-    message="B002: Python does not support the unary prefix increment. Writing "
+    message="B002 Python does not support the unary prefix increment. Writing "
             "++n is equivalent to +(+(n)), which equals n. You meant n += 1.",
     type=BugBearChecker,
 )
 
 B003 = partial(
     error,
-    message="B003: Assigning to `os.environ` doesn't clear the environment. "
+    message="B003 Assigning to `os.environ` doesn't clear the environment. "
             "Subprocesses are going to see outdated variables, in disagreement "
             "with the current process. Use `os.environ.clear()` or the `env=` "
             "argument to Popen.",
@@ -263,7 +263,7 @@ B003 = partial(
 
 B004 = partial(
     error,
-    message="B004: Using `hasattr(x, '__call__')` to test if `x` is callable "
+    message="B004 Using `hasattr(x, '__call__')` to test if `x` is callable "
             "is unreliable. If `x` implements custom `__getattr__` or its "
             "`__call__` is itself not callable, you might get misleading "
             "results. Use `callable(x)` for consistent results.",
@@ -272,7 +272,7 @@ B004 = partial(
 
 B005 = partial(
     error,
-    message="B005: Using .strip() with multi-character strings is misleading "
+    message="B005 Using .strip() with multi-character strings is misleading "
             "the reader. It looks like stripping a substring. Move your "
             "character set to a constant if this is deliberate. Use "
             ".replace() or regular expressions to remove string fragments.",
@@ -283,7 +283,7 @@ B005.valid_paths = {}
 
 B006 = partial(
     error,
-    message="B006: Do not use mutable data structures for argument defaults. "
+    message="B006 Do not use mutable data structures for argument defaults. "
             "All calls reuse one instance of that data structure, persisting "
             "changes between them.",
     type=BugBearChecker,
@@ -307,7 +307,7 @@ B006.mutable_calls = {
 # through if they're not.
 B301 = partial(
     error,
-    message="B301: Python 3 does not include `.iter*` methods on dictionaries. "
+    message="B301 Python 3 does not include `.iter*` methods on dictionaries. "
             "Remove the `iter` prefix from the method name. For Python 2 "
             "compatibility, prefer the Python 3 equivalent unless you expect "
             "the size of the container to be large or unbounded. Then use "
@@ -319,7 +319,7 @@ B301.valid_paths = {'six', 'future.utils', 'builtins'}
 
 B302 = partial(
     error,
-    message="B302: Python 3 does not include `.view*` methods on dictionaries. "
+    message="B302 Python 3 does not include `.view*` methods on dictionaries. "
             "Remove the `view` prefix from the method name. For Python 2 "
             "compatibility, prefer the Python 3 equivalent unless you expect "
             "the size of the container to be large or unbounded. Then use "
@@ -331,7 +331,7 @@ B302.valid_paths = {'six', 'future.utils', 'builtins'}
 
 B303 = partial(
     error,
-    message="B303: `__metaclass__` does nothing on Python 3. Use "
+    message="B303 `__metaclass__` does nothing on Python 3. Use "
             "`class MyClass(BaseClass, metaclass=...)`. For Python 2 "
             "compatibility, use `six.add_metaclass`.",
     type=BugBearChecker,
@@ -339,13 +339,13 @@ B303 = partial(
 
 B304 = partial(
     error,
-    message="B304: `sys.maxint` is not a thing on Python 3. Use `sys.maxsize`.",
+    message="B304 `sys.maxint` is not a thing on Python 3. Use `sys.maxsize`.",
     type=BugBearChecker,
 )
 
 B305 = partial(
     error,
-    message="B305: `.next()` is not a thing on Python 3. Use the `next()` "
+    message="B305 `.next()` is not a thing on Python 3. Use the `next()` "
             "builtin. For Python 2 compatibility, use `six.next()`.",
     type=BugBearChecker,
 )
@@ -354,7 +354,7 @@ B305.valid_paths = {'six', 'future.utils', 'builtins'}
 
 B306 = partial(
     error,
-    message="B306: `BaseException.message` has been deprecated as of Python "
+    message="B306 `BaseException.message` has been deprecated as of Python "
             "2.6 and is removed in Python 3. Use `str(e)` to access the "
             "user-readable message. Use `e.args` to access arguments passed "
             "to the exception.",
@@ -363,14 +363,14 @@ B306 = partial(
 
 B901 = partial(
     error,
-    message=("B901: Using `yield` together with `return x`. Use native "
+    message=("B901 Using `yield` together with `return x`. Use native "
              "`async def` coroutines or put a `# noqa` comment on this "
              "line if this was intentional."),
     type=BugBearChecker,
 )
 B950 = partial(
     error,
-    message=("B950: line too long"),
+    message=("B950 line too long"),
     type=BugBearChecker,
 )
 
