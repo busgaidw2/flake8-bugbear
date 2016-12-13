@@ -17,3 +17,15 @@ for i in range(10):
     for j in range(10):
         for k in range(10):  # k not used, i and j used transitively
             print(i + j)
+
+
+def strange_generator():
+    for i in range(10):
+        for j in range(10):
+            for k in range(10):
+                for l in range(10):
+                    yield i, (j, (k, l))
+
+
+for i, (j, (k, l)) in strange_generator():  # i, k not used
+    print(j, l)

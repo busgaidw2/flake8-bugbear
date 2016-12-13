@@ -34,20 +34,26 @@ class BugBearChecker:
             if pycodestyle.noqa(self.lines[e.lineno - 1]):
                 continue
 
-            yield e
+            yield self.adapt_error(e)
         for lineno, line in enumerate(self.lines, start=1):
             length = len(line) - 1
             if length > 1.1 * self.max_line_length:
                 if pycodestyle.noqa(line):
                     continue
 
-                yield B950(
-                    lineno,
-                    length,
-                    message='B950: line too long ({} > {} characters)'.format(
-                        length, self.max_line_length,
-                    ),
+                yield self.adapt_error(
+                    B950(
+                        lineno,
+                        length,
+                        vars=(length, self.max_line_length),
+                    )
                 )
+
+    @classmethod
+    def adapt_error(cls, e):
+        """Adapts the extended error namedtuple to be compatible with Flake8."""
+        return e._replace(message=e.message.format(*e.vars))[:4]
+
 
     def load_file(self):
         """Loads the file in a way that auto-detects source encoding and deals
@@ -170,8 +176,7 @@ class BugBearVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_For(self, node):
-        if not node.target.id.startswith('_'):
-            self.check_for_b007(node)
+        self.check_for_b007(node)
         self.generic_visit(node)
 
     def visit_FunctionDef(self, node):
@@ -239,94 +244,74 @@ class BugBearVisitor(ast.NodeVisitor):
         )
 
     def check_for_b007(self, node):
-        target = node.target
-        finder = NameFinder(name=target.id)
+        targets = NameFinder()
+        targets.visit(node.target)
+        ctrl_names = set(filter(lambda s: not s.startswith('_'), targets.names))
+        body = NameFinder()
         for expr in node.body:
-            finder.visit(expr)
-            if finder.found:
-                break
-
-        if not finder.found:
-            self.errors.append(
-                B007(target.lineno, target.col_offset)
-            )
+            body.visit(expr)
+        used_names = set(body.names)
+        for name in sorted(ctrl_names - used_names):
+            n = targets.names[name][0]
+            self.errors.append(B007(n.lineno, n.col_offset, vars=(name,)))
 
 
 @attr.s
 class NameFinder(ast.NodeVisitor):
     """Finds a name within a tree of nodes.
 
-    After `.visit(node)` is called, sets `found` to True if `name` is present in
-    `node` or its children.
+    After `.visit(node)` is called, `found` is a dict with all name nodes inside,
+    key is name string, value is the node (useful for location purposes).
     """
-    name = attr.ib()
-    found = attr.ib(default=False)
+    names = attr.ib(default=attr.Factory(dict))
 
     def visit_Name(self, node):
-        if node.id == self.name:
-            self.found = True
-
-    def generic_visit(self, node):
-        """Small optimization to not continue visiting after name was found."""
-        if self.found:
-            return
-
-        super().generic_visit(node)
+        self.names.setdefault(node.id, []).append(node)
 
 
-error = namedtuple('error', 'lineno col message type')
+error = namedtuple('error', 'lineno col message type vars')
+Error = partial(partial, error, type=BugBearChecker, vars=())
 
-B001 = partial(
-    error,
+
+B001 = Error(
     message="B001 Do not use bare `except:`, it also catches unexpected "
             "events like memory errors, interrupts, system exit, and so on.  "
             "Prefer `except Exception:`.  If you're sure what you're doing, "
             "be explicit and write `except BaseException:`.",
-    type=BugBearChecker,
 )
 
-B002 = partial(
-    error,
+B002 = Error(
     message="B002 Python does not support the unary prefix increment. Writing "
             "++n is equivalent to +(+(n)), which equals n. You meant n += 1.",
-    type=BugBearChecker,
 )
 
-B003 = partial(
-    error,
+B003 = Error(
     message="B003 Assigning to `os.environ` doesn't clear the environment. "
             "Subprocesses are going to see outdated variables, in disagreement "
             "with the current process. Use `os.environ.clear()` or the `env=` "
             "argument to Popen.",
-    type=BugBearChecker,
 )
 
-B004 = partial(
-    error,
+B004 = Error(
     message="B004 Using `hasattr(x, '__call__')` to test if `x` is callable "
             "is unreliable. If `x` implements custom `__getattr__` or its "
             "`__call__` is itself not callable, you might get misleading "
             "results. Use `callable(x)` for consistent results.",
-    type=BugBearChecker,
 )
 
-B005 = partial(
-    error,
+B005 = Error(
     message="B005 Using .strip() with multi-character strings is misleading "
             "the reader. It looks like stripping a substring. Move your "
             "character set to a constant if this is deliberate. Use "
             ".replace() or regular expressions to remove string fragments.",
-    type=BugBearChecker,
 )
 B005.methods = {'lstrip', 'rstrip', 'strip'}
 B005.valid_paths = {}
 
-B006 = partial(
-    error,
+B006 = Error(
     message="B006 Do not use mutable data structures for argument defaults. "
             "All calls reuse one instance of that data structure, persisting "
             "changes between them.",
-    type=BugBearChecker,
 )
 B006.mutable_literals = (ast.Dict, ast.List, ast.Set)
 B006.mutable_calls = {
@@ -342,83 +327,65 @@ B006.mutable_calls = {
     'list',
     'set',
 }
-B007 = partial(
-    error,
-    message="B007 Loop control variable not used within the loop body. "
+B007 = Error(
+    message="B007 Loop control variable {!r} not used within the loop body. "
             "If this is intended, start the name with an underscore.",
-    type=BugBearChecker,
 )
 
 
 # Those could be false positives but it's more dangerous to let them slip
 # through if they're not.
-B301 = partial(
-    error,
+B301 = Error(
     message="B301 Python 3 does not include `.iter*` methods on dictionaries. "
             "Remove the `iter` prefix from the method name. For Python 2 "
             "compatibility, prefer the Python 3 equivalent unless you expect "
             "the size of the container to be large or unbounded. Then use "
             "`six.iter*` or `future.utils.iter*`.",
-    type=BugBearChecker,
 )
 B301.methods = {'iterkeys', 'itervalues', 'iteritems', 'iterlists'}
 B301.valid_paths = {'six', 'future.utils', 'builtins'}
 
-B302 = partial(
-    error,
+B302 = Error(
     message="B302 Python 3 does not include `.view*` methods on dictionaries. "
             "Remove the `view` prefix from the method name. For Python 2 "
             "compatibility, prefer the Python 3 equivalent unless you expect "
             "the size of the container to be large or unbounded. Then use "
             "`six.view*` or `future.utils.view*`.",
-    type=BugBearChecker,
 )
 B302.methods = {'viewkeys', 'viewvalues', 'viewitems', 'viewlists'}
 B302.valid_paths = {'six', 'future.utils', 'builtins'}
 
-B303 = partial(
-    error,
+B303 = Error(
     message="B303 `__metaclass__` does nothing on Python 3. Use "
             "`class MyClass(BaseClass, metaclass=...)`. For Python 2 "
             "compatibility, use `six.add_metaclass`.",
-    type=BugBearChecker,
 )
 
-B304 = partial(
-    error,
+B304 = Error(
     message="B304 `sys.maxint` is not a thing on Python 3. Use `sys.maxsize`.",
-    type=BugBearChecker,
 )
 
-B305 = partial(
-    error,
+B305 = Error(
     message="B305 `.next()` is not a thing on Python 3. Use the `next()` "
             "builtin. For Python 2 compatibility, use `six.next()`.",
-    type=BugBearChecker,
 )
 B305.methods = {'next'}
 B305.valid_paths = {'six', 'future.utils', 'builtins'}
 
-B306 = partial(
-    error,
+B306 = Error(
     message="B306 `BaseException.message` has been deprecated as of Python "
             "2.6 and is removed in Python 3. Use `str(e)` to access the "
             "user-readable message. Use `e.args` to access arguments passed "
             "to the exception.",
-    type=BugBearChecker,
 )
 
-B901 = partial(
-    error,
-    message=("B901 Using `yield` together with `return x`. Use native "
-             "`async def` coroutines or put a `# noqa` comment on this "
-             "line if this was intentional."),
-    type=BugBearChecker,
+B901 = Error(
+    message="B901 Using `yield` together with `return x`. Use native "
+            "`async def` coroutines or put a `# noqa` comment on this "
+            "line if this was intentional.",
 )
-B950 = partial(
-    error,
-    message=("B950 line too long"),
-    type=BugBearChecker,
+B950 = Error(
+    message='B950: line too long ({} > {} characters)',
 )
 
 disabled_by_default = ["B901", "B950"]

@@ -174,6 +174,11 @@ MIT
 Change Log
 ----------
 
+16.12.1
+~~~~~~~
+
+* bugfix: B007 no longer crashes on tuple unpacking in for-loops
+
 16.12.0
 ~~~~~~~
 
