@@ -1,4 +1,5 @@
 from pathlib import Path
+import subprocess
 import unittest
 
 from bugbear import BugBearChecker
@@ -26,7 +27,6 @@ class BugbearTestCase(unittest.TestCase):
 
     def errors(self, *errors):
         return [BugBearChecker.adapt_error(e) for e in errors]
-
 
     def test_b001(self):
         filename = Path(__file__).absolute().parent / 'b001.py'
@@ -139,6 +139,30 @@ class BugbearTestCase(unittest.TestCase):
             errors,
             self.errors(B950(6, 87, vars=(87, 79))),
         )
+
+    def test_selfclean_bugbear(self):
+        filename = Path(__file__).absolute().parent.parent / 'bugbear.py'
+        proc = subprocess.run(
+            ['flake8', str(filename)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=60,
+        )
+        self.assertEqual(proc.returncode, 0)
+        self.assertEqual(proc.stdout, b'')
+        # self.assertEqual(proc.stderr, b'')
+
+    def test_selfclean_test_bugbear(self):
+        filename = Path(__file__).absolute()
+        proc = subprocess.run(
+            ['flake8', str(filename)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=60,
+        )
+        self.assertEqual(proc.returncode, 0, proc.stdout.decode('utf8'))
+        self.assertEqual(proc.stdout, b'')
+        # self.assertEqual(proc.stderr, b'')
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import ast
 from collections import namedtuple
 from contextlib import suppress
@@ -53,7 +54,6 @@ class BugBearChecker:
     def adapt_error(cls, e):
         """Adapts the extended error namedtuple to be compatible with Flake8."""
         return e._replace(message=e.message.format(*e.vars))[:4]
-
 
     def load_file(self):
         """Loads the file in a way that auto-detects source encoding and deals
