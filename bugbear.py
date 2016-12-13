@@ -7,7 +7,7 @@ import attr
 import pycodestyle
 
 
-__version__ = '16.11.1'
+__version__ = '16.12.0'
 
 
 @attr.s
@@ -169,6 +169,11 @@ class BugBearVisitor(ast.NodeVisitor):
                     )
         self.generic_visit(node)
 
+    def visit_For(self, node):
+        if not node.target.id.startswith('_'):
+            self.check_for_b007(node)
+        self.generic_visit(node)
+
     def visit_FunctionDef(self, node):
         xs = list(node.body)
         has_yield = False
@@ -232,6 +237,41 @@ class BugBearVisitor(ast.NodeVisitor):
         self.errors.append(
             B005(node.lineno, node.col_offset)
         )
+
+    def check_for_b007(self, node):
+        target = node.target
+        finder = NameFinder(name=target.id)
+        for expr in node.body:
+            finder.visit(expr)
+            if finder.found:
+                break
+
+        if not finder.found:
+            self.errors.append(
+                B007(target.lineno, target.col_offset)
+            )
+
+
+@attr.s
+class NameFinder(ast.NodeVisitor):
+    """Finds a name within a tree of nodes.
+
+    After `.visit(node)` is called, sets `found` to True if `name` is present in
+    `node` or its children.
+    """
+    name = attr.ib()
+    found = attr.ib(default=False)
+
+    def visit_Name(self, node):
+        if node.id == self.name:
+            self.found = True
+
+    def generic_visit(self, node):
+        """Small optimization to not continue visiting after name was found."""
+        if self.found:
+            return
+
+        super().generic_visit(node)
 
 
 error = namedtuple('error', 'lineno col message type')
@@ -302,6 +342,13 @@ B006.mutable_calls = {
     'list',
     'set',
 }
+B007 = partial(
+    error,
+    message="B007 Loop control variable not used within the loop body. "
+            "If this is intended, start the name with an underscore.",
+    type=BugBearChecker,
+)
+
 
 # Those could be false positives but it's more dangerous to let them slip
 # through if they're not.

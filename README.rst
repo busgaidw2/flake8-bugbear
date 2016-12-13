@@ -49,6 +49,9 @@ character set to a constant if this is deliberate. Use
 calls reuse one instance of that data structure, persisting changes
 between them.
 
+**B007**: Loop control variable not used within the loop body.  If this is
+intended, start the name with an underscore.
+
 
 Python 3 compatibility warnings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -174,8 +177,13 @@ Change Log
 16.12.0
 ~~~~~~~
 
+* introduced B007
+
 * bugfix: remove an extra colon in error formatting that was making Bugbear
   errors invisible in Syntastic
+
+* marked as "Beta" in trove classifiers, it's been used in production
+  for 8+ months
 
 16.11.1
 ~~~~~~~
