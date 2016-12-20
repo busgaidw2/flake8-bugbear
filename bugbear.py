@@ -2,26 +2,30 @@
 import ast
 from collections import namedtuple
 from contextlib import suppress
-from functools import partial
+from functools import lru_cache, partial
+import itertools
+import logging
 
 import attr
 import pycodestyle
 
 
-__version__ = '16.12.1'
+__version__ = '16.12.2'
+
+LOG = logging.getLogger('flake8.bugbear')
 
 
-@attr.s
+@attr.s(hash=False)
 class BugBearChecker:
     name = 'flake8-bugbear'
     version = __version__
 
     tree = attr.ib(default=None)
     filename = attr.ib(default='(none)')
-    builtins = attr.ib(default=None)
     lines = attr.ib(default=None)
     max_line_length = attr.ib(default=79)
     visitor = attr.ib(default=attr.Factory(lambda: BugBearVisitor))
+    options = attr.ib(default=None)
 
     def run(self):
         if not self.tree or not self.lines:
@@ -31,23 +35,25 @@ class BugBearChecker:
             lines=self.lines,
         )
         visitor.visit(self.tree)
-        for e in visitor.errors:
+        for e in itertools.chain(visitor.errors, self.gen_line_based_checks()):
             if pycodestyle.noqa(self.lines[e.lineno - 1]):
                 continue
 
-            yield self.adapt_error(e)
+            if self.should_warn(e.message[:4]):
+                yield self.adapt_error(e)
+
+    def gen_line_based_checks(self):
+        """gen_line_based_checks() -> (error, error, error, ...)
+
+        The following simple checks are based on the raw lines, not the AST.
+        """
         for lineno, line in enumerate(self.lines, start=1):
             length = len(line) - 1
             if length > 1.1 * self.max_line_length:
-                if pycodestyle.noqa(line):
-                    continue
-
-                yield self.adapt_error(
-                    B950(
-                        lineno,
-                        length,
-                        vars=(length, self.max_line_length),
-                    )
+                yield B950(
+                    lineno,
+                    length,
+                    vars=(length, self.max_line_length),
                 )
 
     @classmethod
@@ -75,6 +81,41 @@ class BugBearChecker:
     def add_options(optmanager):
         """Informs flake8 to ignore B9xx by default."""
         optmanager.extend_default_ignore(disabled_by_default)
+
+    @lru_cache()
+    def should_warn(self, code):
+        """Returns `True` if Bugbear should emit a particular warning.
+
+        flake8 overrides default ignores when the user specifies
+        `ignore = ` in configuration.  This is problematic because it means
+        specifying anything in `ignore = ` implicitly enables all optional
+        warnings.  This function is a workaround for this behavior.
+
+        As documented in the READM, the user is expected to explicitly select
+        the warnings.
+        """
+        if code[:2] != 'B9':
+            # Normal warnings are safe for emission.
+            return True
+
+        if self.options is None:
+            LOG.info(
+                "Options not provided to Bugbear, optional warning %s selected.",
+                code,
+            )
+            return True
+
+        for i in range(2, len(code)):
+            if code[:i] in self.options.select:
+                return True
+
+        LOG.info(
+            "Optional warning %s not present in selected warnings: %r. Not "
+            "firing it at all.",
+            code,
+            self.options.select,
+        )
+        return False
 
 
 @attr.s

@@ -2,7 +2,7 @@
 flake8-bugbear
 ==============
 
-A plugin for flake8 finding likely bugs and design problems in your
+A plugin for Flake8 finding likely bugs and design problems in your
 program.  Contains warnings that don't belong in pyflakes and
 pycodestyle::
 
@@ -95,9 +95,32 @@ message. Use ``e.args`` to access arguments passed to the exception.
 Opinionated warnings
 ~~~~~~~~~~~~~~~~~~~~
 
-The following warnings are disabled by default because they are controversial.
-They may or may not apply to you, enable them explicitly in your configuration
-if you find them useful.
+The following warnings are disabled by default because they are
+controversial.  They may or may not apply to you, enable them explicitly
+in your configuration if you find them useful.  Read below on how to
+enable.
+
+**B901**: Using ``return x`` in a generator function used to be
+syntactically invalid in Python 2. In Python 3 ``return x`` can be used
+in a generator as a return value in conjunction with ``yield from``.
+Users coming from Python 2 may expect the old behavior which might lead
+to bugs.  Use native ``async def`` coroutines or mark intentional
+``return x`` usage with ``# noqa`` on the same line.
+
+**B950**: Line too long. This is a pragmatic equivalent of ``pycodestyle``'s
+E501: it considers "max-line-length" but only triggers when the value has been
+exceeded by **more than 10%**. You will no longer be forced to reformat code
+due to the closing parenthesis being one character too far to satisfy the
+linter. At the same time, if you do significantly violate the line length, you
+will receive a message that states what the actual limit is. This is inspired
+by Raymond Hettinger's `"Beyond PEP 8" talk
+<https://www.youtube.com/watch?v=wf-BqAjZb8M>`_ and highway patrol not
+stopping you if you drive < 5mph too fast. Disable E501 to avoid duplicate
+warnings.
+
+
+How to enable opinionated warnings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To enable these checks, specify a ``--select`` command-line option or
 ``select=`` option in your config file.  As of Flake8 3.0, this option
@@ -115,26 +138,13 @@ errors and warnings, the pyflakes fatals and all default Bugbear checks.
 Finally, we're also specifying B901 as a check that we want enabled.
 
 If you'd like all optional warnings to be enabled for you (future proof
-your config!), say ``B9`` instead of ``B901``. You will need flake8 3.2+
+your config!), say ``B9`` instead of ``B901``. You will need Flake8 3.2+
 for this feature.
 
-**B901**: Using ``return x`` in a generator function used to be syntactically
-invalid in Python 2. In Python 3 ``return x`` can be used in a generator as
-a return value in conjunction with ``yield from``.  Users coming from Python 2
-may expect the old behavior which might lead to bugs.  Use native ``async def``
-coroutines or mark intentional ``return x`` usage with ``# noqa`` on the same
-line.
-
-**B950**: Line too long. This is a pragmatic equivalent of ``pycodestyle``'s
-E501: it considers "max-line-length" but only triggers when the value has been
-exceeded by **more than 10%**. You will no longer be forced to reformat code
-due to the closing parenthesis being one character too far to satisfy the
-linter. At the same time, if you do significantly violate the line length, you
-will receive a message that states what the actual limit is. This is inspired
-by Raymond Hettinger's `"Beyond PEP 8" talk
-<https://www.youtube.com/watch?v=wf-BqAjZb8M>`_ and highway patrol not
-stopping you if you drive < 5mph too fast. Disable E501 to avoid duplicate
-warnings.
+Note that ``pycodestyle`` also has a bunch of warnings that are disabled
+by default.  Those get enabled as soon as there is an ``ignore =`` line
+in your configuration.  I think this behavior is surprising so Bugbear's
+opinionated warnings require explicit selection.
 
 
 Tests
@@ -173,6 +183,13 @@ MIT
 
 Change Log
 ----------
+
+16.12.2
+~~~~~~~
+
+* bugfix: opinionated warnings on longer get enabled when user specifies
+  ``ignore =`` in the configuration.  Now they require explicit
+  selection as documented above also in this case.
 
 16.12.1
 ~~~~~~~

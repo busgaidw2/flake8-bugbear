@@ -137,7 +137,7 @@ class BugbearTestCase(unittest.TestCase):
         errors = list(bbc.run())
         self.assertEqual(
             errors,
-            self.errors(B950(6, 87, vars=(87, 79))),
+            self.errors(B950(6, 92, vars=(92, 79))),
         )
 
     def test_selfclean_bugbear(self):
