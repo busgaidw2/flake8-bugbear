@@ -187,7 +187,7 @@ Change Log
 16.12.2
 ~~~~~~~
 
-* bugfix: opinionated warnings on longer get enabled when user specifies
+* bugfix: opinionated warnings no longer get enabled when user specifies
   ``ignore =`` in the configuration.  Now they require explicit
   selection as documented above also in this case.
 
