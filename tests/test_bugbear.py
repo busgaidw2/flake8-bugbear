@@ -148,7 +148,7 @@ class BugbearTestCase(unittest.TestCase):
             stderr=subprocess.PIPE,
             timeout=60,
         )
-        self.assertEqual(proc.returncode, 0)
+        self.assertEqual(proc.returncode, 0, proc.stdout.decode('utf8'))
         self.assertEqual(proc.stdout, b'')
         # self.assertEqual(proc.stderr, b'')
 
