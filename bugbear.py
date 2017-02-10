@@ -426,7 +426,7 @@ B901 = Error(
             "line if this was intentional.",
 )
 B950 = Error(
-    message='B950: line too long ({} > {} characters)',
+    message='B950 line too long ({} > {} characters)',
 )
 
 disabled_by_default = ["B901", "B950"]
