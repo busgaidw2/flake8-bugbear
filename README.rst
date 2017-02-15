@@ -195,6 +195,9 @@ Change Log
 
 * bugfix: opinionated warnings no longer invisible in Syntastic
 
+* bugfix: opinionated warnings stay visible when --select on the
+  command-line is used with full three-digit error codes
+
 16.12.2
 ~~~~~~~
 
