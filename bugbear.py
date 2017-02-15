@@ -105,7 +105,7 @@ class BugBearChecker:
             )
             return True
 
-        for i in range(2, len(code)):
+        for i in range(2, len(code) + 1):
             if code[:i] in self.options.select:
                 return True
 
