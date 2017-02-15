@@ -221,38 +221,9 @@ class BugBearVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_FunctionDef(self, node):
-        xs = list(node.body)
-        has_yield = False
-        return_node = None
-        while xs:
-            x = xs.pop()
-            if isinstance(x, (ast.AsyncFunctionDef, ast.FunctionDef)):
-                continue
-            elif isinstance(x, (ast.Yield, ast.YieldFrom)):
-                has_yield = True
-            elif isinstance(x, ast.Return) and x.value is not None:
-                return_node = x
-
-            if has_yield and return_node is not None:
-                self.errors.append(
-                    B901(return_node.lineno, return_node.col_offset)
-                )
-                break
-
-            xs.extend(ast.iter_child_nodes(x))
-
-        for default in node.args.defaults:
-            if isinstance(default, B006.mutable_literals):
-                self.errors.append(
-                    B006(default.lineno, default.col_offset)
-                )
-            elif isinstance(default, ast.Call):
-                call_path = '.'.join(self.compose_call_path(default.func))
-                if call_path in B006.mutable_calls:
-                    self.errors.append(
-                        B006(default.lineno, default.col_offset)
-                    )
-
+        self.check_for_b901(node)
+        self.check_for_b902(node)
+        self.check_for_b006(node)
         self.generic_visit(node)
 
     def compose_call_path(self, node):
@@ -284,6 +255,19 @@ class BugBearVisitor(ast.NodeVisitor):
             B005(node.lineno, node.col_offset)
         )
 
+    def check_for_b006(self, node):
+        for default in node.args.defaults:
+            if isinstance(default, B006.mutable_literals):
+                self.errors.append(
+                    B006(default.lineno, default.col_offset)
+                )
+            elif isinstance(default, ast.Call):
+                call_path = '.'.join(self.compose_call_path(default.func))
+                if call_path in B006.mutable_calls:
+                    self.errors.append(
+                        B006(default.lineno, default.col_offset)
+                    )
+
     def check_for_b007(self, node):
         targets = NameFinder()
         targets.visit(node.target)
@@ -295,6 +279,86 @@ class BugBearVisitor(ast.NodeVisitor):
         for name in sorted(ctrl_names - used_names):
             n = targets.names[name][0]
             self.errors.append(B007(n.lineno, n.col_offset, vars=(name,)))
+
+    def check_for_b901(self, node):
+        xs = list(node.body)
+        has_yield = False
+        return_node = None
+        while xs:
+            x = xs.pop()
+            if isinstance(x, (ast.AsyncFunctionDef, ast.FunctionDef)):
+                continue
+            elif isinstance(x, (ast.Yield, ast.YieldFrom)):
+                has_yield = True
+            elif isinstance(x, ast.Return) and x.value is not None:
+                return_node = x
+
+            if has_yield and return_node is not None:
+                self.errors.append(
+                    B901(return_node.lineno, return_node.col_offset)
+                )
+                break
+
+            xs.extend(ast.iter_child_nodes(x))
+
+    def check_for_b902(self, node):
+        if not isinstance(self.node_stack[-2], ast.ClassDef):
+            return
+
+        decorators = NameFinder()
+        decorators.visit(node.decorator_list)
+
+        if 'staticmethod' in decorators.names:
+            # TODO: maybe warn if the first argument is surprisingly `self` or
+            # `cls`?
+            return
+
+        if (
+            'classmethod' in decorators.names or
+            node.name in B902.implicit_classmethods
+        ):
+            expected_first_args = B902.cls
+            kind = 'class'
+        else:
+            expected_first_args = B902.self
+            kind = 'instance'
+
+        args = node.args.args
+        vararg = node.args.vararg
+        kwarg = node.args.kwarg
+        kwonlyargs = node.args.kwonlyargs
+
+        if args:
+            actual_first_arg = args[0].arg
+            lineno = args[0].lineno
+            col = args[0].col_offset
+        elif vararg:
+            actual_first_arg = '*' + vararg.arg
+            lineno = vararg.lineno
+            col = vararg.col_offset
+        elif kwarg:
+            actual_first_arg = '**' + kwarg.arg
+            lineno = kwarg.lineno
+            col = kwarg.col_offset
+        elif kwonlyargs:
+            actual_first_arg = '*, ' + kwonlyargs[0].arg
+            lineno = kwonlyargs[0].lineno
+            col = kwonlyargs[0].col_offset
+        else:
+            actual_first_arg = '(none)'
+            lineno = node.lineno
+            col = node.col_offset
+
+        if actual_first_arg not in expected_first_args:
+            if not actual_first_arg.startswith(('(', '*')):
+                actual_first_arg = repr(actual_first_arg)
+            self.errors.append(
+                B902(
+                    lineno,
+                    col,
+                    vars=(actual_first_arg, kind, expected_first_args[0])
+                )
+            )
 
 
 @attr.s
@@ -308,6 +372,15 @@ class NameFinder(ast.NodeVisitor):
 
     def visit_Name(self, node):
         self.names.setdefault(node.id, []).append(node)
+
+    def visit(self, node):
+        """Like super-visit but supports iteration over lists."""
+        if not isinstance(node, list):
+            return super().visit(node)
+
+        for elem in node:
+            super().visit(elem)
+        return node
 
 
 error = namedtuple('error', 'lineno col message type vars')
@@ -425,8 +498,16 @@ B901 = Error(
             "`async def` coroutines or put a `# noqa` comment on this "
             "line if this was intentional.",
 )
+B902 = Error(
+    message="B902 Invalid first argument {} used for {} method. Use the "
+            "canonical first argument name in methods, i.e. {}."
+)
+B902.implicit_classmethods = {'__new__', '__init_subclass__'}
+B902.self = ['self']  # it's a list because the first is preferred
+B902.cls = ['cls', 'klass']  # ditto.
+
 B950 = Error(
     message='B950 line too long ({} > {} characters)',
 )
 
-disabled_by_default = ["B901", "B950"]
+disabled_by_default = ["B901", "B902", "B950"]

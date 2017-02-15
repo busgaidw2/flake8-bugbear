@@ -18,6 +18,7 @@ from bugbear import (
     B305,
     B306,
     B901,
+    B902,
     B950,
 )
 
@@ -129,6 +130,23 @@ class BugbearTestCase(unittest.TestCase):
         self.assertEqual(
             errors,
             self.errors(B901(8, 8), B901(35, 4))
+        )
+
+    def test_b902(self):
+        filename = Path(__file__).absolute().parent / 'b902.py'
+        bbc = BugBearChecker(filename=str(filename))
+        errors = list(bbc.run())
+        self.assertEqual(
+            errors,
+            self.errors(
+                B902(26, 17, vars=("'i_am_special'", 'instance', 'self')),
+                B902(29, 30, vars=("'cls'", 'instance', 'self')),
+                B902(32, 4, vars=("(none)", 'instance', 'self',)),
+                B902(36, 12, vars=("'self'", 'class', 'cls')),
+                B902(39, 22, vars=("*args", 'instance', 'self')),
+                B902(45, 30, vars=("**kwargs", 'instance', 'self')),
+                B902(48, 32, vars=("*, self", 'instance', 'self')),
+            )
         )
 
     def test_b950(self):

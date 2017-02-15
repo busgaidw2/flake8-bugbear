@@ -107,6 +107,10 @@ Users coming from Python 2 may expect the old behavior which might lead
 to bugs.  Use native ``async def`` coroutines or mark intentional
 ``return x`` usage with ``# noqa`` on the same line.
 
+**B902**: Invalid first argument used for method. Use ``self`` for
+instance methods, and `cls` for class methods (which includes `__new__`
+and `__init_subclass__`).
+
 **B950**: Line too long. This is a pragmatic equivalent of ``pycodestyle``'s
 E501: it considers "max-line-length" but only triggers when the value has been
 exceeded by **more than 10%**. You will no longer be forced to reformat code
@@ -183,6 +187,13 @@ MIT
 
 Change Log
 ----------
+
+17.2.0
+~~~~~~
+
+* introduced B902
+
+* bugfix: opinionated warnings no longer invisible in Syntastic
 
 16.12.2
 ~~~~~~~
