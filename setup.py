@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Łukasz Langa
+# Copyright (C) 2016-2017 Łukasz Langa
 
 import ast
 import os
@@ -33,7 +33,7 @@ setup(
     keywords='flake8 bugbear bugs pyflakes pylint linter qa',
     author='Łukasz Langa',
     author_email='lukasz@langa.pl',
-    url='https://github.com/ambv/flake8-bugbear',
+    url='https://github.com/PyCQA/flake8-bugbear',
     license='MIT',
     py_modules=['bugbear'],
     zip_safe=False,
