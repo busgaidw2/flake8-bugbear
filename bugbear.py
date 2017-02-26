@@ -10,7 +10,7 @@ import attr
 import pycodestyle
 
 
-__version__ = '17.2.0'
+__version__ = '17.2.1'
 
 LOG = logging.getLogger('flake8.bugbear')
 
@@ -313,19 +313,30 @@ class BugBearVisitor(ast.NodeVisitor):
             # `cls`?
             return
 
-        if (
-            'classmethod' in decorators.names or
-            node.name in B902.implicit_classmethods
-        ):
-            expected_first_args = B902.cls
-            kind = 'class'
-        elif any(getattr(x, 'id', None) == 'type'
-                 for x in self.node_stack[-2].bases):
-            expected_first_args = B902.cls
-            kind = 'metaclass instance'
+        bases = {
+            b.id
+            for b in self.node_stack[-2].bases if isinstance(b, ast.Name)
+        }
+        if 'type' in bases:
+            if (
+                'classmethod' in decorators.names or
+                node.name in B902.implicit_classmethods
+            ):
+                expected_first_args = B902.metacls
+                kind = 'metaclass class'
+            else:
+                expected_first_args = B902.cls
+                kind = 'metaclass instance'
         else:
-            expected_first_args = B902.self
-            kind = 'instance'
+            if (
+                'classmethod' in decorators.names or
+                node.name in B902.implicit_classmethods
+            ):
+                expected_first_args = B902.cls
+                kind = 'class'
+            else:
+                expected_first_args = B902.self
+                kind = 'instance'
 
         args = node.args.args
         vararg = node.args.vararg
@@ -509,6 +520,7 @@ B902 = Error(
 B902.implicit_classmethods = {'__new__', '__init_subclass__'}
 B902.self = ['self']  # it's a list because the first is preferred
 B902.cls = ['cls', 'klass']  # ditto.
+B902.metacls = ['metacls', 'metaclass', 'typ']  # ditto.
 
 B950 = Error(
     message='B950 line too long ({} > {} characters)',

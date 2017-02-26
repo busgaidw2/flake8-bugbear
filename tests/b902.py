@@ -53,7 +53,29 @@ class Meta(type):
     def __init__(cls, name, bases, d):
         ...
 
+    @classmethod
+    def __prepare__(metacls, name, bases):
+        return {}
+
 
 class OtherMeta(type):
     def __init__(self, name, bases, d):
+        ...
+
+    @classmethod
+    def __prepare__(cls, name, bases):
+        return {}
+
+
+def type_factory():
+    return object
+
+
+class CrazyBases(Warnings, type_factory(), metaclass=type):
+    def __init__(self):
+        ...
+
+
+class RuntimeError("This is not a base"):
+    def __init__(self):
         ...
