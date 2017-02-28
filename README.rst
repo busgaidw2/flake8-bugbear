@@ -316,4 +316,5 @@ Authors
 -------
 
 Glued together by `Łukasz Langa <mailto:lukasz@langa.pl>`_. Multiple
-improvements by `Markus Unterwaditzer <mailto:markus@unterwaditzer.net>`_.
+improvements by `Markus Unterwaditzer <mailto:markus@unterwaditzer.net>`_
+and `Martijn Pieters <mailto:github.com@zopatista.com>`_.
