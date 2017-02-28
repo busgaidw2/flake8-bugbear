@@ -195,10 +195,10 @@ MIT
 Change Log
 ----------
 
-* introduced B903 (patch contributed by Martijn Pieters)
-
 17.2.1
 ~~~~~~
+
+* introduced B903 (patch contributed by Martijn Pieters)
 
 * bugfix: B902 now enforces `cls` for instance methods on metaclasses
   and `metacls` for class methods on metaclasses
