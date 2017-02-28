@@ -24,7 +24,7 @@ List of warnings
 **B001**: Do not use bare ``except:``, it also catches unexpected events
 like memory errors, interrupts, system exit, and so on.  Prefer ``except
 Exception:``.  If you're sure what you're doing, be explicit and write
-``except BaseException:``.
+``except BaseException:``.  Disable E722 to avoid duplicate warnings.
 
 **B002**: Python does not support the unary prefix increment. Writing
 ``++n`` is equivalent to ``+(+(n))``, which equals ``n``. You meant ``n
@@ -115,19 +115,19 @@ classes directly inheriting from ``type``).
 **B903**: Use ``collections.namedtuple`` (or ``typing.NamedTuple``) for
 data classes that only set attributes in an ``__init__`` method, and do
 nothing else. If the attributes should be mutable, define the attributes
-in ``__slots__`` to save per-instance memory and to prevent accidentally 
+in ``__slots__`` to save per-instance memory and to prevent accidentally
 creating additional attributes on instances.
 
-**B950**: Line too long. This is a pragmatic equivalent of ``pycodestyle``'s
-E501: it considers "max-line-length" but only triggers when the value has been
-exceeded by **more than 10%**. You will no longer be forced to reformat code
-due to the closing parenthesis being one character too far to satisfy the
-linter. At the same time, if you do significantly violate the line length, you
-will receive a message that states what the actual limit is. This is inspired
-by Raymond Hettinger's `"Beyond PEP 8" talk
-<https://www.youtube.com/watch?v=wf-BqAjZb8M>`_ and highway patrol not
-stopping you if you drive < 5mph too fast. Disable E501 to avoid duplicate
-warnings.
+**B950**: Line too long. This is a pragmatic equivalent of
+``pycodestyle``'s E501: it considers "max-line-length" but only triggers
+when the value has been exceeded by **more than 10%**. You will no
+longer be forced to reformat code due to the closing parenthesis being
+one character too far to satisfy the linter. At the same time, if you do
+significantly violate the line length, you will receive a message that
+states what the actual limit is. This is inspired by Raymond Hettinger's
+`"Beyond PEP 8" talk <https://www.youtube.com/watch?v=wf-BqAjZb8M>`_ and
+highway patrol not stopping you if you drive < 5mph too fast. Disable
+E501 to avoid duplicate warnings.
 
 
 How to enable opinionated warnings
