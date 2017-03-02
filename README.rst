@@ -198,7 +198,7 @@ MIT
 Change Log
 ----------
 
-17.2.1
+17.3.0
 ~~~~~~
 
 * introduced B903 (patch contributed by Martijn Pieters)
