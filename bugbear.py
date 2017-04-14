@@ -10,7 +10,7 @@ import attr
 import pycodestyle
 
 
-__version__ = '17.3.0'
+__version__ = '17.4.0'
 
 LOG = logging.getLogger('flake8.bugbear')
 
@@ -218,6 +218,11 @@ class BugBearVisitor(ast.NodeVisitor):
 
     def visit_For(self, node):
         self.check_for_b007(node)
+        self.generic_visit(node)
+
+    def visit_AsyncFunctionDef(self, node):
+        self.check_for_b902(node)
+        self.check_for_b006(node)
         self.generic_visit(node)
 
     def visit_FunctionDef(self, node):

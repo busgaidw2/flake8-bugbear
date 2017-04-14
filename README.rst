@@ -198,6 +198,11 @@ MIT
 Change Log
 ----------
 
+17.4.0
+~~~~~~
+
+* bugfix: Also check async functions for B006 + B902
+
 17.3.0
 ~~~~~~
 
@@ -319,5 +324,6 @@ Authors
 -------
 
 Glued together by `Łukasz Langa <mailto:lukasz@langa.pl>`_. Multiple
-improvements by `Markus Unterwaditzer <mailto:markus@unterwaditzer.net>`_
-and `Martijn Pieters <mailto:github.com@zopatista.com>`_.
+improvements by `Markus Unterwaditzer <mailto:markus@unterwaditzer.net>`_,
+`Martijn Pieters <mailto:github.com@zopatista.com>`_, and
+`Cooper Lees <mailto:me@cooperlees.com>`_.
