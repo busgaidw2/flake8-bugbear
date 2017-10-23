@@ -40,7 +40,7 @@ setup(
     install_requires=['flake8 >= 3.0.0', 'attrs'],
     test_suite='tests.test_bugbear',
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Framework :: Flake8',
         'Intended Audience :: Developers',
