@@ -10,7 +10,7 @@ import attr
 import pycodestyle
 
 
-__version__ = '17.4.0'
+__version__ = '17.12.0'
 
 LOG = logging.getLogger('flake8.bugbear')
 
@@ -276,6 +276,10 @@ class BugBearVisitor(ast.NodeVisitor):
                     self.errors.append(
                         B006(default.lineno, default.col_offset)
                     )
+                else:
+                    self.errors.append(
+                        B008(default.lineno, default.col_offset)
+                    )
 
     def check_for_b007(self, node):
         targets = NameFinder()
@@ -499,6 +503,13 @@ B006.mutable_calls = {
 B007 = Error(
     message="B007 Loop control variable {!r} not used within the loop body. "
             "If this is intended, start the name with an underscore.",
+)
+B008 = Error(
+    message="B008 Do not perform calls in argument defaults. The call is "
+            "performed only once at function definition time. All calls to your "
+            "function will reuse the result of that definition-time call. If "
+            "this is intended, assign the function call to a module-level "
+            "variable and use that variable as a default value.",
 )
 
 

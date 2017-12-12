@@ -55,6 +55,12 @@ between them.
 **B007**: Loop control variable not used within the loop body.  If this is
 intended, start the name with an underscore.
 
+**B008**: Do not perform calls in argument defaults.  The call is
+performed only once at function definition time.  All calls to your
+function will reuse the result of that definition-time call.  If this is
+intended, assign the function call to a module-level variable and use
+that variable as a default value.
+
 
 Python 3 compatibility warnings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -197,6 +203,13 @@ MIT
 
 Change Log
 ----------
+
+17.12.0
+~~~~~~~
+
+* graduated to Production/Stable in trove classifiers
+
+* introduced B008
 
 17.4.0
 ~~~~~~
