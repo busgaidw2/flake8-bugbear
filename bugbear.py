@@ -10,7 +10,7 @@ import attr
 import pycodestyle
 
 
-__version__ = '17.12.0'
+__version__ = '18.2.0'
 
 LOG = logging.getLogger('flake8.bugbear')
 
