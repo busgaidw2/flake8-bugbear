@@ -186,8 +186,8 @@ time.
 
 If you're still invested in Python 2, there might be a small subset of
 deprecated syntax that you'd have to abandon... but you're already doing
-that, right?  `six <https://pypi.python.org/pypi/six>`_ or
-`python-future <https://pypi.python.org/pypi/future>`_ bridge the gaps.
+that, right?  `six <https://pypi.org/project/six/>`_ or
+`python-future <https://pypi.org/project/future/>`_ bridge the gaps.
 
 By making the code exclusively Python 3.5+, I'm able to focus on the
 quality of the checks and re-use all the nice features of the new
