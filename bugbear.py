@@ -208,6 +208,10 @@ class BugBearVisitor(ast.NodeVisitor):
         self.check_for_b007(node)
         self.generic_visit(node)
 
+    def visit_Assert(self, node):
+        self.check_for_b011(node)
+        self.generic_visit(node)
+
     def visit_AsyncFunctionDef(self, node):
         self.check_for_b902(node)
         self.check_for_b006(node)
@@ -272,6 +276,10 @@ class BugBearVisitor(ast.NodeVisitor):
         for name in sorted(ctrl_names - used_names):
             n = targets.names[name][0]
             self.errors.append(B007(n.lineno, n.col_offset, vars=(name,)))
+
+    def check_for_b011(self, node):
+        if isinstance(node.test, ast.NameConstant) and node.test.value is False:
+            self.errors.append(B011(node.lineno, node.col_offset))
 
     def check_for_b901(self, node):
         xs = list(node.body)
@@ -493,6 +501,10 @@ B009 = Error(
 B010 = Error(
     message="B010 Do not call setattr with a constant attribute value, "
     "it is not any safer than normal property access."
+)
+B011 = Error(
+    message="B011 Do not call assert False since python -O removes these calls. "
+            "Instead callers should raise AssertionError()."
 )
 
 

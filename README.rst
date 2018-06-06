@@ -90,6 +90,9 @@ ahead of time.
 property access: ``x.attr = val``. There is no additional safety in
 using ``setattr`` if you know the attribute name ahead of time.
 
+**B011**: Do not call `assert False` since `python -O` removes these calls.
+Instead callers should `raise AssertionError()`.
+
 
 Python 3 compatibility warnings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
