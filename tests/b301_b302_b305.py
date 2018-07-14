@@ -1,8 +1,8 @@
 """
 Should emit:
-B301 - on lines 33-36
-B302 - on lines 37-40
-B305 - on lines 37-40
+B301 - on lines 39-42
+B302 - on lines 43-46
+B305 - on lines 47-48
 """
 
 import builtins  # future's builtins really
@@ -10,6 +10,7 @@ import future.utils
 import six
 from six import iterkeys
 from future.utils import itervalues
+
 
 def this_is_okay():
     d = {}
@@ -31,6 +32,7 @@ def this_is_okay():
     future.utils.viewlists(d)
     six.next(d)
     builtins.next(d)
+
 
 def everything_else_is_wrong():
     d = None  # note: bugbear is no type checker

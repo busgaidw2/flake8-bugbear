@@ -1,7 +1,8 @@
 """
 Should emit:
-B901 - on lines 8, 35
+B901 - on lines 9, 36
 """
+
 
 def broken():
     if True:
@@ -39,6 +40,7 @@ def broken2():
 
 async def not_broken4():
     import asyncio
+
     await asyncio.sleep(1)
     return 1
 
