@@ -20,6 +20,22 @@ pycodestyle::
     3. A fearsome imaginary creature, especially one evoked to frighten
        children.
 
+Installation
+------------
+
+Install from ``pip`` with:
+
+.. code-block:: sh
+
+     pip install flake8-bugbear
+
+It will then automatically be run as part of ``flake8``; you can check it has
+been picked up with:
+
+.. code-block:: sh
+
+    $ flake8 --version
+    3.5.0 (assertive: 1.0.1, flake8-bugbear: 18.2.0, flake8-comprehensions: 1.4.1, mccabe: 0.6.1, pycodestyle: 2.3.1, pyflakes: 1.6.0) CPython 3.7.0 on Darwin
 
 List of warnings
 ----------------
