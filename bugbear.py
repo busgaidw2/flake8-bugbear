@@ -239,7 +239,7 @@ class BugBearVisitor(ast.NodeVisitor):
         self.errors.append(B005(node.lineno, node.col_offset))
 
     def check_for_b006(self, node):
-        for default in node.args.defaults:
+        for default in node.args.defaults + node.args.kw_defaults:
             if isinstance(default, B006.mutable_literals):
                 self.errors.append(B006(default.lineno, default.col_offset))
             elif isinstance(default, ast.Call):
