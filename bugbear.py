@@ -246,7 +246,7 @@ class BugBearVisitor(ast.NodeVisitor):
                 call_path = ".".join(self.compose_call_path(default.func))
                 if call_path in B006.mutable_calls:
                     self.errors.append(B006(default.lineno, default.col_offset))
-                else:
+                elif call_path not in B008.immutable_calls:
                     self.errors.append(B008(default.lineno, default.col_offset))
 
     def check_for_b007(self, node):
@@ -470,6 +470,10 @@ B008 = Error(
     "this is intended, assign the function call to a module-level "
     "variable and use that variable as a default value."
 )
+B008.immutable_calls = {
+    'tuple',
+    'frozenset',
+}
 
 
 # Those could be false positives but it's more dangerous to let them slip

@@ -7,6 +7,10 @@ def this_is_okay(value=(1, 2, 3)):
     ...
 
 
+def and_this_also(value=tuple()):
+    pass
+
+
 def this_is_wrong(value=[1, 2, 3]):
     ...
 
