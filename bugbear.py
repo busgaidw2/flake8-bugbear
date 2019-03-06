@@ -552,7 +552,7 @@ B902 = Error(
 B902.implicit_classmethods = {"__new__", "__init_subclass__"}
 B902.self = ["self"]  # it's a list because the first is preferred
 B902.cls = ["cls", "klass"]  # ditto.
-B902.metacls = ["metacls", "metaclass", "typ"]  # ditto.
+B902.metacls = ["metacls", "metaclass", "typ", "mcs"]  # ditto.
 
 B903 = Error(
     message="B903 Data class should either be immutable or use __slots__ to "

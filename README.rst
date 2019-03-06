@@ -233,6 +233,12 @@ MIT
 Change Log
 ----------
 
+19.3.0
+~~~~~~
+
+* For B902, the first argument for metaclass class methods can be
+  "mcs", matching the name preferred by PyCharm.
+
 18.2.0
 ~~~~~~
 
