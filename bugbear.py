@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import ast
 from collections import namedtuple
 from contextlib import suppress
