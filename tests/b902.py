@@ -90,3 +90,13 @@ class RuntimeError("This is not a base"):
     def __init__(self):
         ...
 
+
+class ImplicitClassMethods:
+    def __new__(cls, *args, **kwargs):
+        ...
+
+    def __init_subclass__(cls, *args, **kwargs):
+        ...
+
+    def __class_getitem__(cls, key):
+        ...

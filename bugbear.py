@@ -560,7 +560,7 @@ B902 = Error(
     message="B902 Invalid first argument {} used for {} method. Use the "
     "canonical first argument name in methods, i.e. {}."
 )
-B902.implicit_classmethods = {"__new__", "__init_subclass__"}
+B902.implicit_classmethods = {"__new__", "__init_subclass__", "__class_getitem__"}
 B902.self = ["self"]  # it's a list because the first is preferred
 B902.cls = ["cls", "klass"]  # ditto.
 B902.metacls = ["metacls", "metaclass", "typ", "mcs"]  # ditto.
