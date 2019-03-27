@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import ast
 from collections import namedtuple
 from contextlib import suppress
@@ -208,6 +207,10 @@ class BugBearVisitor(ast.NodeVisitor):
         self.check_for_b007(node)
         self.generic_visit(node)
 
+    def visit_Assert(self, node):
+        self.check_for_b011(node)
+        self.generic_visit(node)
+
     def visit_AsyncFunctionDef(self, node):
         self.check_for_b902(node)
         self.check_for_b006(node)
@@ -272,6 +275,10 @@ class BugBearVisitor(ast.NodeVisitor):
         for name in sorted(ctrl_names - used_names):
             n = targets.names[name][0]
             self.errors.append(B007(n.lineno, n.col_offset, vars=(name,)))
+
+    def check_for_b011(self, node):
+        if isinstance(node.test, ast.NameConstant) and node.test.value is False:
+            self.errors.append(B011(node.lineno, node.col_offset))
 
     def check_for_b901(self, node):
         xs = list(node.body)
@@ -494,6 +501,10 @@ B010 = Error(
     message="B010 Do not call setattr with a constant attribute value, "
     "it is not any safer than normal property access."
 )
+B011 = Error(
+    message="B011 Do not call assert False since python -O removes these calls. "
+            "Instead callers should raise AssertionError()."
+)
 
 
 # Those could be false positives but it's more dangerous to let them slip
@@ -552,7 +563,7 @@ B902 = Error(
 B902.implicit_classmethods = {"__new__", "__init_subclass__", "__class_getitem__"}
 B902.self = ["self"]  # it's a list because the first is preferred
 B902.cls = ["cls", "klass"]  # ditto.
-B902.metacls = ["metacls", "metaclass", "typ"]  # ditto.
+B902.metacls = ["metacls", "metaclass", "typ", "mcs"]  # ditto.
 
 B903 = Error(
     message="B903 Data class should either be immutable or use __slots__ to "

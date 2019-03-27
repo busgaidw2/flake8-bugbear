@@ -72,6 +72,10 @@ class OtherMeta(type):
     def __prepare__(cls, name, bases):
         return {}
 
+    @classmethod
+    def first_arg_mcs_allowed(mcs, value):
+        ...
+
 
 def type_factory():
     return object

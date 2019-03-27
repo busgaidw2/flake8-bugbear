@@ -90,6 +90,9 @@ ahead of time.
 property access: ``x.attr = val``. There is no additional safety in
 using ``setattr`` if you know the attribute name ahead of time.
 
+**B011**: Do not call `assert False` since `python -O` removes these calls.
+Instead callers should `raise AssertionError()`.
+
 
 Python 3 compatibility warnings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -232,6 +235,12 @@ MIT
 
 Change Log
 ----------
+
+19.3.0
+~~~~~~
+
+* For B902, the first argument for metaclass class methods can be
+  "mcs", matching the name preferred by PyCharm.
 
 18.2.0
 ~~~~~~

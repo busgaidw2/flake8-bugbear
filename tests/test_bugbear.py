@@ -14,6 +14,7 @@ from bugbear import (
     B008,
     B009,
     B010,
+    B011,
     B301,
     B302,
     B303,
@@ -109,6 +110,15 @@ class BugbearTestCase(unittest.TestCase):
         bbc = BugBearChecker(filename=str(filename))
         errors = list(bbc.run())
         self.assertEqual(errors, self.errors(B009(15, 0), B010(22, 0)))
+
+    def test_b011(self):
+        filename = Path(__file__).absolute().parent / 'b011.py'
+        bbc = BugBearChecker(filename=str(filename))
+        errors = list(bbc.run())
+        self.assertEqual(
+            errors,
+            self.errors(B011(8, 0, vars=('i',)), B011(10, 0, vars=('k',))),
+        )
 
     def test_b301_b302_b305(self):
         filename = Path(__file__).absolute().parent / "b301_b302_b305.py"
