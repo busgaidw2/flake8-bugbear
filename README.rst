@@ -239,8 +239,19 @@ Change Log
 19.3.0
 ~~~~~~
 
+* allow 'mcs' for metaclass classmethod first arg (PyCharm default)
+* Introduce B011
+* Introduce B009 and B010
+* Exclude immutable calls like tuple() and frozenset() from B008
 * For B902, the first argument for metaclass class methods can be
   "mcs", matching the name preferred by PyCharm.
+
+18.8.0
+~~~~~~
+
+* black format all .py files
+* Examine kw-only args for mutable defaults
+* Test for Python 3.7
 
 18.2.0
 ~~~~~~
