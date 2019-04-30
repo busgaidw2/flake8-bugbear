@@ -149,8 +149,8 @@ to bugs.  Use native ``async def`` coroutines or mark intentional
 ``return x`` usage with ``# noqa`` on the same line.
 
 **B902**: Invalid first argument used for method. Use ``self`` for
-instance methods, and `cls` for class methods (which includes `__new__`
-and `__init_subclass__`) or instance methods of metaclasses (detected as
+instance methods, and ``cls`` for class methods (which includes ``__new__``
+and ``__init_subclass__``) or instance methods of metaclasses (detected as
 classes directly inheriting from ``type``).
 
 **B903**: Use ``collections.namedtuple`` (or ``typing.NamedTuple``) for
