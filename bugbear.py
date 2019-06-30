@@ -281,23 +281,31 @@ class BugBearVisitor(ast.NodeVisitor):
             self.errors.append(B011(node.lineno, node.col_offset))
 
     def check_for_b901(self, node):
-        xs = list(node.body)
+        xs = [(None, x) for x in node.body]
+
         has_yield = False
         return_node = None
+
         while xs:
-            x = xs.pop()
+            parent, x = xs.pop()
             if isinstance(x, (ast.AsyncFunctionDef, ast.FunctionDef)):
+                # Do not recurse into inner functions (`def` in
+                # `def`).
                 continue
-            elif isinstance(x, (ast.Yield, ast.YieldFrom)):
+
+            # Only consider yield when it is part of an Expr statement.
+            if isinstance(parent, ast.Expr) and isinstance(x, (ast.Yield, ast.YieldFrom)):
                 has_yield = True
-            elif isinstance(x, ast.Return) and x.value is not None:
+
+            if isinstance(x, ast.Return) and x.value is not None:
                 return_node = x
 
             if has_yield and return_node is not None:
                 self.errors.append(B901(return_node.lineno, return_node.col_offset))
                 break
 
-            xs.extend(ast.iter_child_nodes(x))
+            for x2 in ast.iter_child_nodes(x):
+                xs.append((x, x2))
 
     def check_for_b902(self, node):
         if not isinstance(self.node_stack[-2], ast.ClassDef):
@@ -490,8 +498,8 @@ B008 = Error(
     "variable and use that variable as a default value."
 )
 B008.immutable_calls = {
-    'tuple',
-    'frozenset',
+    "tuple",
+    "frozenset"
 }
 B009 = Error(
     message="B009 Do not call getattr with a constant attribute value, "
