@@ -281,6 +281,9 @@ class BugBearVisitor(ast.NodeVisitor):
             self.errors.append(B011(node.lineno, node.col_offset))
 
     def check_for_b901(self, node):
+        if node.name == '__await__':
+            return
+
         xs = [(None, x) for x in node.body]
 
         has_yield = False

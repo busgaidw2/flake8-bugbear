@@ -75,3 +75,9 @@ def not_broken8():
 
     inner((yield from []))
     return x
+
+
+class NotBroken9(object):
+    def __await__(self):
+        yield from function()
+        return 42
