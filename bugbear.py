@@ -498,8 +498,8 @@ B008 = Error(
     "variable and use that variable as a default value."
 )
 B008.immutable_calls = {
-    "tuple",
-    "frozenset"
+    'tuple',
+    'frozenset',
 }
 B009 = Error(
     message="B009 Do not call getattr with a constant attribute value, "
