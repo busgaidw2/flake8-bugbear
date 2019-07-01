@@ -130,7 +130,7 @@ class BugBearVisitor(ast.NodeVisitor):
     def visit(self, node):
         self.node_stack.append(node)
         self.node_window.append(node)
-        self.node_window = self.node_window[-self.NODE_WINDOW_SIZE:]
+        self.node_window = self.node_window[-self.NODE_WINDOW_SIZE :]
         super().visit(node)
         self.node_stack.pop()
 
@@ -489,10 +489,7 @@ B008 = Error(
     "this is intended, assign the function call to a module-level "
     "variable and use that variable as a default value."
 )
-B008.immutable_calls = {
-    'tuple',
-    'frozenset',
-}
+B008.immutable_calls = {"tuple", "frozenset"}
 B009 = Error(
     message="B009 Do not call getattr with a constant attribute value, "
     "it is not any safer than normal property access."
@@ -503,7 +500,7 @@ B010 = Error(
 )
 B011 = Error(
     message="B011 Do not call assert False since python -O removes these calls. "
-            "Instead callers should raise AssertionError()."
+    "Instead callers should raise AssertionError()."
 )
 
 

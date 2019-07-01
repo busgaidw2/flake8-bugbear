@@ -47,8 +47,10 @@ def do_this_instead_of_calls_in_defaults(logger=LOGGER):
     # That makes it more obvious that this one value is reused.
     ...
 
+
 def kwonlyargs_immutable(*, value=()):
     ...
+
 
 def kwonlyargs_mutable(*, value=[]):
     ...

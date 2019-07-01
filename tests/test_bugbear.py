@@ -112,12 +112,11 @@ class BugbearTestCase(unittest.TestCase):
         self.assertEqual(errors, self.errors(B009(15, 0), B010(22, 0)))
 
     def test_b011(self):
-        filename = Path(__file__).absolute().parent / 'b011.py'
+        filename = Path(__file__).absolute().parent / "b011.py"
         bbc = BugBearChecker(filename=str(filename))
         errors = list(bbc.run())
         self.assertEqual(
-            errors,
-            self.errors(B011(8, 0, vars=('i',)), B011(10, 0, vars=('k',))),
+            errors, self.errors(B011(8, 0, vars=("i",)), B011(10, 0, vars=("k",)))
         )
 
     def test_b301_b302_b305(self):
