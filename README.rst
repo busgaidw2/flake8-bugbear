@@ -67,18 +67,19 @@ the reader. It looks like stripping a substring. Move your
 character set to a constant if this is deliberate. Use
 ``.replace()`` or regular expressions to remove string fragments.
 
-**B006**: Do not use mutable data structures for argument defaults.  All
-calls reuse one instance of that data structure, persisting changes
+**B006**: Do not use mutable data structures for argument defaults.  They
+are created during function definition time. All calls to the function
+reuse this one instance of that data structure, persisting changes
 between them.
 
 **B007**: Loop control variable not used within the loop body.  If this is
 intended, start the name with an underscore.
 
-**B008**: Do not perform calls in argument defaults.  The call is
-performed only once at function definition time.  All calls to your
-function will reuse the result of that definition-time call.  If this is
-intended, assign the function call to a module-level variable and use
-that variable as a default value.
+**B008**: Do not perform function calls in argument defaults.  The call is
+performed only once at function definition time. All calls to your
+function will reuse the result of that definition-time function call.  If
+this is intended, assign the function call to a module-level variable and
+use that variable as a default value.
 
 **B009**: Do not call ``getattr(x, 'attr')``, instead use normal
 property access: ``x.attr``. Missing a default to ``getattr`` will cause
