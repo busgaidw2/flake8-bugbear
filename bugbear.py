@@ -130,7 +130,7 @@ class BugBearVisitor(ast.NodeVisitor):
     def visit(self, node):
         self.node_stack.append(node)
         self.node_window.append(node)
-        self.node_window = self.node_window[-self.NODE_WINDOW_SIZE:]
+        self.node_window = self.node_window[-self.NODE_WINDOW_SIZE :]
         super().visit(node)
         self.node_stack.pop()
 
@@ -471,9 +471,10 @@ B005.methods = {"lstrip", "rstrip", "strip"}
 B005.valid_paths = {}
 
 B006 = Error(
-    message="B006 Do not use mutable data structures for argument defaults. "
-    "All calls reuse one instance of that data structure, persisting "
-    "changes between them."
+    message="B006 Do not use mutable data structures for argument defaults.  They "
+    "are created during function definition time. All calls to the function "
+    "reuse this one instance of that data structure, persisting changes "
+    "between them."
 )
 B006.mutable_literals = (ast.Dict, ast.List, ast.Set)
 B006.mutable_calls = {
@@ -494,16 +495,13 @@ B007 = Error(
     "If this is intended, start the name with an underscore."
 )
 B008 = Error(
-    message="B008 Do not perform calls in argument defaults. The call is "
+    message="B008: Do not perform function calls in argument defaults.  The call is "
     "performed only once at function definition time. All calls to your "
-    "function will reuse the result of that definition-time call. If "
-    "this is intended, assign the function call to a module-level "
-    "variable and use that variable as a default value."
+    "function will reuse the result of that definition-time function call.  If "
+    "this is intended, assign the function call to a module-level variable and "
+    "use that variable as a default value."
 )
-B008.immutable_calls = {
-    'tuple',
-    'frozenset',
-}
+B008.immutable_calls = {"tuple", "frozenset"}
 B009 = Error(
     message="B009 Do not call getattr with a constant attribute value, "
     "it is not any safer than normal property access."
@@ -514,7 +512,7 @@ B010 = Error(
 )
 B011 = Error(
     message="B011 Do not call assert False since python -O removes these calls. "
-            "Instead callers should raise AssertionError()."
+    "Instead callers should raise AssertionError()."
 )
 
 
