@@ -6,13 +6,13 @@ dist: xenial
 matrix:
   fast_finish: true
   include:
-    - python: 3.5
     - python: 3.6
     - python: 3.7
     - python: 3.8-dev
-      env: PYTHON_VER=py38
+    - python: nightly
   allow_failures:
-    - env: PYTHON_VER=py38
+    - python: 3.8-dev
+    - python: nightly
 
 install:
   - pip install --upgrade pip setuptools black
