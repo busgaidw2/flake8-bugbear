@@ -281,7 +281,7 @@ class BugBearVisitor(ast.NodeVisitor):
             self.errors.append(B011(node.lineno, node.col_offset))
 
     def check_for_b901(self, node):
-        if node.name == '__await__':
+        if node.name == "__await__":
             return
 
         xs = [(None, x) for x in node.body]
@@ -297,7 +297,9 @@ class BugBearVisitor(ast.NodeVisitor):
                 continue
 
             # Only consider yield when it is part of an Expr statement.
-            if isinstance(parent, ast.Expr) and isinstance(x, (ast.Yield, ast.YieldFrom)):
+            if isinstance(parent, ast.Expr) and isinstance(
+                x, (ast.Yield, ast.YieldFrom)
+            ):
                 has_yield = True
 
             if isinstance(x, ast.Return) and x.value is not None:
