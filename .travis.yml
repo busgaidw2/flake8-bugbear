@@ -1,3 +1,4 @@
+---
 language: python
 cache: pip
 dist: xenial
@@ -10,12 +11,12 @@ matrix:
     - python: 3.7
     - python: 3.8-dev
       env: PYTHON_VER=py38
-   allow_failures:
+  allow_failures:
     - env: PYTHON_VER=py38
 
 install:
-    - pip install black
-    - pip install -e .
+  - pip install black
+  - pip install -e .
 
 script:
-    - python setup.py test && find . -type f -name '*.py' | xargs black --check
+  - python setup.py test && find . -type f -name '*.py' | xargs black --check
