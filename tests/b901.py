@@ -55,3 +55,29 @@ def not_broken5():
         return 2
 
     yield inner()
+
+
+def not_broken6():
+    return (yield from [])
+
+
+def not_broken7():
+    x = (yield from [])
+    return x
+
+
+def not_broken8():
+    x = None
+
+    def inner(ex):
+        nonlocal x
+        x = ex
+
+    inner((yield from []))
+    return x
+
+
+class NotBroken9(object):
+    def __await__(self):
+        yield from function()
+        return 42
