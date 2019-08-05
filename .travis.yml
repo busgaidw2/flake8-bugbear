@@ -15,8 +15,8 @@ matrix:
     - env: PYTHON_VER=py38
 
 install:
-  - pip install black
-  - pip install -e .
+  - pip install --upgrade pip setuptools black
+  - pip install .
 
 script:
   - python setup.py test && find . -type f -name '*.py' | xargs black --check

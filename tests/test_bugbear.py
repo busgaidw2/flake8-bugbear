@@ -87,7 +87,7 @@ class BugbearTestCase(unittest.TestCase):
                 B006(26, 19),
                 B006(30, 31),
                 B008(39, 38),
-                B006(53, 32),
+                B006(55, 32),
             ),
         )
 
