@@ -226,6 +226,10 @@ class BugBearVisitor(ast.NodeVisitor):
         self.check_for_b903(node)
         self.generic_visit(node)
 
+    def visit_Try(self, node):
+        self.check_for_b012(node)
+        self.generic_visit(node)
+
     def compose_call_path(self, node):
         if isinstance(node, ast.Attribute):
             yield from self.compose_call_path(node.value)
@@ -280,22 +284,39 @@ class BugBearVisitor(ast.NodeVisitor):
         if isinstance(node.test, ast.NameConstant) and node.test.value is False:
             self.errors.append(B011(node.lineno, node.col_offset))
 
+    def check_for_b012(self, node):
+        def _loop(node):
+            if isinstance(node, (ast.AsyncFunctionDef, ast.FunctionDef)):
+                return
+
+            if isinstance(node, (ast.Return, ast.Continue, ast.Break)):
+                self.errors.append(B012(node.lineno, node.col_offset))
+
+            for child in ast.iter_child_nodes(node):
+                _loop(child)
+
+        for child in node.finalbody:
+            _loop(child)
+
+    def walk_function_body(self, node):
+        def _loop(parent, node):
+            if isinstance(node, (ast.AsyncFunctionDef, ast.FunctionDef)):
+                return
+            yield parent, node
+            for child in ast.iter_child_nodes(node):
+                yield from _loop(node, child)
+
+        for child in node.body:
+            yield from _loop(node, child)
+
     def check_for_b901(self, node):
         if node.name == "__await__":
             return
 
-        xs = [(None, x) for x in node.body]
-
         has_yield = False
         return_node = None
 
-        while xs:
-            parent, x = xs.pop()
-            if isinstance(x, (ast.AsyncFunctionDef, ast.FunctionDef)):
-                # Do not recurse into inner functions (`def` in
-                # `def`).
-                continue
-
+        for parent, x in self.walk_function_body(node):
             # Only consider yield when it is part of an Expr statement.
             if isinstance(parent, ast.Expr) and isinstance(
                 x, (ast.Yield, ast.YieldFrom)
@@ -308,9 +329,6 @@ class BugBearVisitor(ast.NodeVisitor):
             if has_yield and return_node is not None:
                 self.errors.append(B901(return_node.lineno, return_node.col_offset))
                 break
-
-            for x2 in ast.iter_child_nodes(x):
-                xs.append((x, x2))
 
     def check_for_b902(self, node):
         if not isinstance(self.node_stack[-2], ast.ClassDef):
@@ -516,7 +534,11 @@ B011 = Error(
     message="B011 Do not call assert False since python -O removes these calls. "
     "Instead callers should raise AssertionError()."
 )
-
+B012 = Error(
+    message="B012 return/continue/break inside finally blocks cause exceptions "
+    "to be silenced. Exceptions should be silenced in except blocks. Control "
+    "statements can be moved outside the finally block."
+)
 
 # Those could be false positives but it's more dangerous to let them slip
 # through if they're not.
@@ -562,6 +584,7 @@ B306 = Error(
     "to the exception."
 )
 
+# Warnings disabled by default.
 B901 = Error(
     message="B901 Using `yield` together with `return x`. Use native "
     "`async def` coroutines or put a `# noqa` comment on this "
