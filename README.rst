@@ -235,9 +235,10 @@ MIT
 Change Log
 ----------
 
-Future
+20.1.1
 ~~~~~~
 
+* Allow continue/break within loops in finally clauses for B012
 * For B001, also check for ``except ():``
 * Introduce B013 and B014 to check tuples in ``except (..., ):`` statements
 
