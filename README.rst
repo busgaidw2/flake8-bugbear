@@ -235,6 +235,11 @@ MIT
 Change Log
 ----------
 
+20.1.2
+~~~~~~
+
+* Fix error on attributes-of-attributes in `except (...):` clauses
+
 20.1.1
 ~~~~~~
 
