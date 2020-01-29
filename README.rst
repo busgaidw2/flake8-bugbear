@@ -238,6 +238,12 @@ MIT
 Change Log
 ----------
 
+20.1.3
+~~~~~~
+
+* Silence B009/B010 for non-identifiers
+* State an ignore might be needed for optional B9x checks
+
 20.1.2
 ~~~~~~
 
