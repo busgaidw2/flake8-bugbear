@@ -238,6 +238,11 @@ MIT
 Change Log
 ----------
 
+20.1.4
+~~~~~~
+
+* Ignore keywords for B009/B010
+
 20.1.3
 ~~~~~~
 
