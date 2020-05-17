@@ -26,9 +26,11 @@ with open(os.path.join(current_dir, "bugbear.py"), "r") as f:
 setup(
     name="flake8-bugbear",
     version=version,
-    description="A plugin for flake8 finding likely bugs and design problems "
-    "in your program. Contains warnings that don't belong in "
-    "pyflakes and pycodestyle.",
+    description=(
+        "A plugin for flake8 finding likely bugs and design problems "
+        "in your program. Contains warnings that don't belong in "
+        "pyflakes and pycodestyle."
+    ),
     long_description=long_description,
     keywords="flake8 bugbear bugs pyflakes pylint linter qa",
     author="Łukasz Langa",

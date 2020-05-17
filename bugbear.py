@@ -520,45 +520,57 @@ Error = partial(partial, error, type=BugBearChecker, vars=())
 
 
 B001 = Error(
-    message="B001 Do not use {}, it also catches unexpected "
-    "events like memory errors, interrupts, system exit, and so on.  "
-    "Prefer `except Exception:`.  If you're sure what you're doing, "
-    "be explicit and write `except BaseException:`."
+    message=(
+        "B001 Do not use {}, it also catches unexpected "
+        "events like memory errors, interrupts, system exit, and so on.  "
+        "Prefer `except Exception:`.  If you're sure what you're doing, "
+        "be explicit and write `except BaseException:`."
+    )
 )
 
 B002 = Error(
-    message="B002 Python does not support the unary prefix increment. Writing "
-    "++n is equivalent to +(+(n)), which equals n. You meant n += 1."
+    message=(
+        "B002 Python does not support the unary prefix increment. Writing "
+        "++n is equivalent to +(+(n)), which equals n. You meant n += 1."
+    )
 )
 
 B003 = Error(
-    message="B003 Assigning to `os.environ` doesn't clear the environment. "
-    "Subprocesses are going to see outdated variables, in disagreement "
-    "with the current process. Use `os.environ.clear()` or the `env=` "
-    "argument to Popen."
+    message=(
+        "B003 Assigning to `os.environ` doesn't clear the environment. "
+        "Subprocesses are going to see outdated variables, in disagreement "
+        "with the current process. Use `os.environ.clear()` or the `env=` "
+        "argument to Popen."
+    )
 )
 
 B004 = Error(
-    message="B004 Using `hasattr(x, '__call__')` to test if `x` is callable "
-    "is unreliable. If `x` implements custom `__getattr__` or its "
-    "`__call__` is itself not callable, you might get misleading "
-    "results. Use `callable(x)` for consistent results."
+    message=(
+        "B004 Using `hasattr(x, '__call__')` to test if `x` is callable "
+        "is unreliable. If `x` implements custom `__getattr__` or its "
+        "`__call__` is itself not callable, you might get misleading "
+        "results. Use `callable(x)` for consistent results."
+    )
 )
 
 B005 = Error(
-    message="B005 Using .strip() with multi-character strings is misleading "
-    "the reader. It looks like stripping a substring. Move your "
-    "character set to a constant if this is deliberate. Use "
-    ".replace() or regular expressions to remove string fragments."
+    message=(
+        "B005 Using .strip() with multi-character strings is misleading "
+        "the reader. It looks like stripping a substring. Move your "
+        "character set to a constant if this is deliberate. Use "
+        ".replace() or regular expressions to remove string fragments."
+    )
 )
 B005.methods = {"lstrip", "rstrip", "strip"}
 B005.valid_paths = {}
 
 B006 = Error(
-    message="B006 Do not use mutable data structures for argument defaults.  They "
-    "are created during function definition time. All calls to the function "
-    "reuse this one instance of that data structure, persisting changes "
-    "between them."
+    message=(
+        "B006 Do not use mutable data structures for argument defaults.  They "
+        "are created during function definition time. All calls to the function "
+        "reuse this one instance of that data structure, persisting changes "
+        "between them."
+    )
 )
 B006.mutable_literals = (ast.Dict, ast.List, ast.Set)
 B006.mutable_calls = {
@@ -575,96 +587,126 @@ B006.mutable_calls = {
     "set",
 }
 B007 = Error(
-    message="B007 Loop control variable {!r} not used within the loop body. "
-    "If this is intended, start the name with an underscore."
+    message=(
+        "B007 Loop control variable {!r} not used within the loop body. "
+        "If this is intended, start the name with an underscore."
+    )
 )
 B008 = Error(
-    message="B008 Do not perform function calls in argument defaults.  The call is "
-    "performed only once at function definition time. All calls to your "
-    "function will reuse the result of that definition-time function call.  If "
-    "this is intended, assign the function call to a module-level variable and "
-    "use that variable as a default value."
+    message=(
+        "B008 Do not perform function calls in argument defaults.  The call is "
+        "performed only once at function definition time. All calls to your "
+        "function will reuse the result of that definition-time function call.  If "
+        "this is intended, assign the function call to a module-level variable and "
+        "use that variable as a default value."
+    )
 )
 B008.immutable_calls = {"tuple", "frozenset"}
 B009 = Error(
-    message="B009 Do not call getattr with a constant attribute value, "
-    "it is not any safer than normal property access."
+    message=(
+        "B009 Do not call getattr with a constant attribute value, "
+        "it is not any safer than normal property access."
+    )
 )
 B010 = Error(
-    message="B010 Do not call setattr with a constant attribute value, "
-    "it is not any safer than normal property access."
+    message=(
+        "B010 Do not call setattr with a constant attribute value, "
+        "it is not any safer than normal property access."
+    )
 )
 B011 = Error(
-    message="B011 Do not call assert False since python -O removes these calls. "
-    "Instead callers should raise AssertionError()."
+    message=(
+        "B011 Do not call assert False since python -O removes these calls. "
+        "Instead callers should raise AssertionError()."
+    )
 )
 B012 = Error(
-    message="B012 return/continue/break inside finally blocks cause exceptions "
-    "to be silenced. Exceptions should be silenced in except blocks. Control "
-    "statements can be moved outside the finally block."
+    message=(
+        "B012 return/continue/break inside finally blocks cause exceptions "
+        "to be silenced. Exceptions should be silenced in except blocks. Control "
+        "statements can be moved outside the finally block."
+    )
 )
 B013 = Error(
-    message="B013 A length-one tuple literal is redundant.  "
-    "Write `except {0}:` instead of `except ({0},):`."
+    message=(
+        "B013 A length-one tuple literal is redundant.  "
+        "Write `except {0}:` instead of `except ({0},):`."
+    )
 )
 B014 = Error(
-    message="B014 Redundant exception types in `except ({0}){1}:`.  "
-    "Write `except {2}{1}:`, which catches exactly the same exceptions."
+    message=(
+        "B014 Redundant exception types in `except ({0}){1}:`.  "
+        "Write `except {2}{1}:`, which catches exactly the same exceptions."
+    )
 )
 
 # Those could be false positives but it's more dangerous to let them slip
 # through if they're not.
 B301 = Error(
-    message="B301 Python 3 does not include `.iter*` methods on dictionaries. "
-    "Remove the `iter` prefix from the method name. For Python 2 "
-    "compatibility, prefer the Python 3 equivalent unless you expect "
-    "the size of the container to be large or unbounded. Then use "
-    "`six.iter*` or `future.utils.iter*`."
+    message=(
+        "B301 Python 3 does not include `.iter*` methods on dictionaries. "
+        "Remove the `iter` prefix from the method name. For Python 2 "
+        "compatibility, prefer the Python 3 equivalent unless you expect "
+        "the size of the container to be large or unbounded. Then use "
+        "`six.iter*` or `future.utils.iter*`."
+    )
 )
 B301.methods = {"iterkeys", "itervalues", "iteritems", "iterlists"}
 B301.valid_paths = {"six", "future.utils", "builtins"}
 
 B302 = Error(
-    message="B302 Python 3 does not include `.view*` methods on dictionaries. "
-    "Remove the `view` prefix from the method name. For Python 2 "
-    "compatibility, prefer the Python 3 equivalent unless you expect "
-    "the size of the container to be large or unbounded. Then use "
-    "`six.view*` or `future.utils.view*`."
+    message=(
+        "B302 Python 3 does not include `.view*` methods on dictionaries. "
+        "Remove the `view` prefix from the method name. For Python 2 "
+        "compatibility, prefer the Python 3 equivalent unless you expect "
+        "the size of the container to be large or unbounded. Then use "
+        "`six.view*` or `future.utils.view*`."
+    )
 )
 B302.methods = {"viewkeys", "viewvalues", "viewitems", "viewlists"}
 B302.valid_paths = {"six", "future.utils", "builtins"}
 
 B303 = Error(
-    message="B303 `__metaclass__` does nothing on Python 3. Use "
-    "`class MyClass(BaseClass, metaclass=...)`. For Python 2 "
-    "compatibility, use `six.add_metaclass`."
+    message=(
+        "B303 `__metaclass__` does nothing on Python 3. Use "
+        "`class MyClass(BaseClass, metaclass=...)`. For Python 2 "
+        "compatibility, use `six.add_metaclass`."
+    )
 )
 
 B304 = Error(message="B304 `sys.maxint` is not a thing on Python 3. Use `sys.maxsize`.")
 
 B305 = Error(
-    message="B305 `.next()` is not a thing on Python 3. Use the `next()` "
-    "builtin. For Python 2 compatibility, use `six.next()`."
+    message=(
+        "B305 `.next()` is not a thing on Python 3. Use the `next()` "
+        "builtin. For Python 2 compatibility, use `six.next()`."
+    )
 )
 B305.methods = {"next"}
 B305.valid_paths = {"six", "future.utils", "builtins"}
 
 B306 = Error(
-    message="B306 `BaseException.message` has been deprecated as of Python "
-    "2.6 and is removed in Python 3. Use `str(e)` to access the "
-    "user-readable message. Use `e.args` to access arguments passed "
-    "to the exception."
+    message=(
+        "B306 `BaseException.message` has been deprecated as of Python "
+        "2.6 and is removed in Python 3. Use `str(e)` to access the "
+        "user-readable message. Use `e.args` to access arguments passed "
+        "to the exception."
+    )
 )
 
 # Warnings disabled by default.
 B901 = Error(
-    message="B901 Using `yield` together with `return x`. Use native "
-    "`async def` coroutines or put a `# noqa` comment on this "
-    "line if this was intentional."
+    message=(
+        "B901 Using `yield` together with `return x`. Use native "
+        "`async def` coroutines or put a `# noqa` comment on this "
+        "line if this was intentional."
+    )
 )
 B902 = Error(
-    message="B902 Invalid first argument {} used for {} method. Use the "
-    "canonical first argument name in methods, i.e. {}."
+    message=(
+        "B902 Invalid first argument {} used for {} method. Use the "
+        "canonical first argument name in methods, i.e. {}."
+    )
 )
 B902.implicit_classmethods = {"__new__", "__init_subclass__", "__class_getitem__"}
 B902.self = ["self"]  # it's a list because the first is preferred
@@ -672,10 +714,12 @@ B902.cls = ["cls", "klass"]  # ditto.
 B902.metacls = ["metacls", "metaclass", "typ", "mcs"]  # ditto.
 
 B903 = Error(
-    message="B903 Data class should either be immutable or use __slots__ to "
-    "save memory. Use collections.namedtuple to generate an immutable "
-    "class, or enumerate the attributes in a __slot__ declaration in "
-    "the class to leave attributes mutable."
+    message=(
+        "B903 Data class should either be immutable or use __slots__ to "
+        "save memory. Use collections.namedtuple to generate an immutable "
+        "class, or enumerate the attributes in a __slot__ declaration in "
+        "the class to leave attributes mutable."
+    )
 )
 
 B950 = Error(message="B950 line too long ({} > {} characters)")
