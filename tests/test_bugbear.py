@@ -179,7 +179,11 @@ class BugbearTestCase(unittest.TestCase):
             B014(27, 0, vars=("MyError, MyError", "", "MyError")),
             B014(41, 0, vars=("MyError, BaseException", " as e", "BaseException")),
             B014(48, 0, vars=("re.error, re.error", "", "re.error")),
-            B014(55, 0, vars=("IOError, EnvironmentError, OSError", "", "OSError"),),
+            B014(
+                55,
+                0,
+                vars=("IOError, EnvironmentError, OSError", "", "OSError"),
+            ),
         )
         self.assertEqual(errors, expected)
 
