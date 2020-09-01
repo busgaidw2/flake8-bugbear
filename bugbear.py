@@ -130,6 +130,16 @@ def _to_name_str(node):
     return _to_name_str(node.value) + "." + node.attr
 
 
+def _typesafe_issubclass(cls, class_or_tuple):
+    try:
+        return issubclass(cls, class_or_tuple)
+    except TypeError:
+        # User code specifies a type that is not a type in our current run. Might be
+        # their error, might be a difference in our environments. We don't know so we
+        # ignore this
+        return False
+
+
 @attr.s
 class BugBearVisitor(ast.NodeVisitor):
     filename = attr.ib()
@@ -190,7 +200,7 @@ class BugBearVisitor(ast.NodeVisitor):
                     good = list(filter(lambda e: e not in aliases, good))
 
                 for name, other in itertools.permutations(tuple(good), 2):
-                    if issubclass(
+                    if _typesafe_issubclass(
                         getattr(builtins, name, type), getattr(builtins, other, ())
                     ):
                         if name in good:
