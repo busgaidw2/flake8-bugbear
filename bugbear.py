@@ -12,7 +12,7 @@ from keyword import iskeyword
 import attr
 import pycodestyle
 
-__version__ = "20.11.1"
+__version__ = "21.3.1"
 
 LOG = logging.getLogger("flake8.bugbear")
 
