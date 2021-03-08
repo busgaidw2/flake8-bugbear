@@ -249,6 +249,11 @@ MIT
 Change Log
 ----------
 
+21.3.2
+~~~~~~
+
+* Fix crash on tuple expansion in try/except block (#161)
+
 21.3.1
 ~~~~~~
 
