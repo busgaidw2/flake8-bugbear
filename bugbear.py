@@ -10,9 +10,10 @@ from functools import lru_cache, partial
 from keyword import iskeyword
 
 import attr
+
 import pycodestyle
 
-__version__ = "21.4.2"
+__version__ = "21.4.3"
 
 LOG = logging.getLogger("flake8.bugbear")
 
@@ -443,6 +444,7 @@ class BugBearVisitor(ast.NodeVisitor):
             and hasattr(item_context.func, "attr")  # noqa W503
             and item_context.func.attr == "assertRaises"  # noqa W503
             and len(item_context.args) == 1  # noqa W503
+            and isinstance(item_context.args[0], ast.Name)  # noqa W503
             and item_context.args[0].id == "Exception"  # noqa W503
             and not item.optional_vars  # noqa W503
         ):
