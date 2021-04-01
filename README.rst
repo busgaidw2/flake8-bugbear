@@ -256,6 +256,11 @@ MIT
 Change Log
 ----------
 
+21.4.3
+~~~~~~
+
+* Verify the element in item_context.args is of type ast.Name for b017 
+
 21.4.2
 ~~~~~~
 
