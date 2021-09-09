@@ -123,9 +123,9 @@ waste CPU instructions. Either prepend ``assert`` or remove it.
 **B016**: Cannot raise a literal. Did you intend to return it or raise
 an Exception?
 
-**B017**: ``self.assertRaises(Exception):`` should be considered evil. It can lead 
-to your test passing even if the code being tested is never executed due to a typo. 
-Either assert for a more specific exception (builtin or custom), use 
+**B017**: ``self.assertRaises(Exception):`` should be considered evil. It can lead
+to your test passing even if the code being tested is never executed due to a typo.
+Either assert for a more specific exception (builtin or custom), use
 ``assertRaisesRegex``, or use the context manager form of assertRaises
 (``with self.assertRaises(Exception) as ex:``) with an assertion against the
 data available in ``ex``.
@@ -156,6 +156,11 @@ data classes that only set attributes in an ``__init__`` method, and do
 nothing else. If the attributes should be mutable, define the attributes
 in ``__slots__`` to save per-instance memory and to prevent accidentally
 creating additional attributes on instances.
+
+**B904**: Within an ``except`` clause, raise exceptions with ``raise ... from err``
+or ``raise ... from None`` to distinguish them from errors in exception handling.
+See [the exception chaining tutorial](https://docs.python.org/3/tutorial/errors.html#exception-chaining)
+for details.
 
 **B950**: Line too long. This is a pragmatic equivalent of
 ``pycodestyle``'s E501: it considers "max-line-length" but only triggers
@@ -217,10 +222,15 @@ MIT
 Change Log
 ----------
 
+Future
+~~~~~~
+
+* Add B904: check for ``raise`` without ``from`` in an ``except`` clause
+
 21.4.3
 ~~~~~~
 
-* Verify the element in item_context.args is of type ast.Name for b017 
+* Verify the element in item_context.args is of type ast.Name for b017
 
 21.4.2
 ~~~~~~
@@ -231,7 +241,7 @@ Change Log
 ~~~~~~
 
 * Add B017: check for gotta-catch-em-all assertRaises(Exception)
-  
+
 21.3.2
 ~~~~~~
 
