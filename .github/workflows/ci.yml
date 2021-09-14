@@ -34,4 +34,4 @@ jobs:
 
     - name: Check formatting
       run: |
-        black --check .
+        black --check --experimental-string-processing .

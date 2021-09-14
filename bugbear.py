@@ -793,9 +793,10 @@ B903 = Error(
 
 B904 = Error(
     message=(
-        "B904 Within an `except` clause, raise exceptions with `raise ... from err` "
-        "or `raise ... from None` to distinguish them from errors in exception handling.  "
-        "See https://docs.python.org/3/tutorial/errors.html#exception-chaining for details."
+        "B904 Within an `except` clause, raise exceptions with `raise ... from err` or"
+        " `raise ... from None` to distinguish them from errors in exception handling. "
+        " See https://docs.python.org/3/tutorial/errors.html#exception-chaining for"
+        " details."
     )
 )
 
