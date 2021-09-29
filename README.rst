@@ -222,9 +222,10 @@ MIT
 Change Log
 ----------
 
-Unreleased
+21.9.2
 ~~~~~~~~~~
 
+* Fix crash on call in except statement in _to_name_str (#187)
 * Update B006: list, dictionary, and set comprehensions are now also disallowed (#186)
 
 21.9.1
