@@ -130,6 +130,8 @@ Either assert for a more specific exception (builtin or custom), use
 (``with self.assertRaises(Exception) as ex:``) with an assertion against the
 data available in ``ex``.
 
+**B018**: Found useless expression. Either assign it to a variable or remove it.
+
 
 Opinionated warnings
 ~~~~~~~~~~~~~~~~~~~~
