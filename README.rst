@@ -215,12 +215,17 @@ The plugin currently has one setting:
 This could be useful, when using other libraries that provide more immutable calls,
 beside those already handled by ``flake8-bugbear``. Calls to these method will no longer raise a ``B008`` warning.
 
-Tests
------
+Tests / Lints
+---------------
 
 Just run::
 
     coverage run tests/test_bugbear.py
+
+
+For linting::
+
+    pre-commit run -a
 
 
 License
@@ -232,11 +237,15 @@ MIT
 Change Log
 ----------
 
-Unreleased
+21.11.28
 ~~~~~~~~~~
 
-* Update B014: ``binascii.Error`` is now treated as a subclass of ``ValueError``
-  (#206)
+* B904: ensure the raise is in the same context with the except (#191)
+* Add Option to extend the list of immutable calls (#204)
+* Update B014: ``binascii.Error`` is now treated as a subclass of ``ValueError`` (#206)
+* add simple pre-commit config (#205)
+* Test with 3.10 official
+* Add B018 check to find useless declarations (#196, #202)
 
 21.9.2
 ~~~~~~~~~~

@@ -27,12 +27,14 @@ except ValueError:
     def proxy():
         raise NameError
 
+
 try:
     from preferred_library import Thing
 except ImportError:
     try:
         from fallback_library import Thing
     except ImportError:
+
         class Thing:
             def __getattr__(self, name):
                 # same as the case above, should not emit.
@@ -45,6 +47,7 @@ except ImportError:
     try:
         from fallback_library import Thing
     except ImportError:
+
         def context_switch():
             try:
                 raise ValueError
