@@ -245,7 +245,7 @@ MIT
 Change Log
 ----------
 
-21.12.0
+22.1.2
 ~~~~~~~~~~
 
 * B950: Add same special cases as E501 (#213)
