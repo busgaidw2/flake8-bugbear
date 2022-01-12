@@ -245,9 +245,11 @@ MIT
 Change Log
 ----------
 
-22.1.2
+22.1.11
 ~~~~~~~~~~
 
+* B018: Ignore JoinedStr (#216)
+* Build universal Python 3 wheels (#214)
 * B950: Add same special cases as E501 (#213)
 
 21.11.29
