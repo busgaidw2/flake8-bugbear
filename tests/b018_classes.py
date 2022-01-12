@@ -1,6 +1,6 @@
 """
 Should emit:
-B018 - on lines 16-26, 30, 33
+B018 - on lines 17-26, 30, 33
 """
 
 
@@ -12,12 +12,12 @@ class Foo2:
     """abc"""
 
     a = 2
-    "str"  # Str
+    "str"  # Str (no raise)
+    f"{int}"  # JoinedStr (no raise)
     1j  # Number (complex)
     1  # Number (int)
     1.0  # Number (float)
     b"foo"  # Binary
-    f"{int}"  # JoinedStr
     True  # NameConstant (True)
     False  # NameConstant (False)
     None  # NameConstant (None)
