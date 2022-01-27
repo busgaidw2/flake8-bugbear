@@ -132,6 +132,8 @@ data available in ``ex``.
 
 **B018**: Found useless expression. Either assign it to a variable or remove it.
 
+**B020**: Loop control variable overrides iterable it iterates
+
 
 Opinionated warnings
 ~~~~~~~~~~~~~~~~~~~~
@@ -244,6 +246,11 @@ MIT
 
 Change Log
 ----------
+
+Unreleased
+~~~~~~~~~~
+
+* B020: ensure loop control variable doesn't overrides iterable it iterates (#220)
 
 22.1.11
 ~~~~~~~~~~
