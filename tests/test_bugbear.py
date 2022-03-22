@@ -284,6 +284,7 @@ class BugbearTestCase(unittest.TestCase):
             self.errors(
                 B020(8, 4, vars=("items",)),
                 B020(21, 9, vars=("values",)),
+                B020(36, 4, vars=("vars",)),
             ),
         )
 

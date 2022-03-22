@@ -557,7 +557,7 @@ class BugBearVisitor(ast.NodeVisitor):
         targets.visit(node.target)
         ctrl_names = set(targets.names)
 
-        iterset = NameFinder()
+        iterset = B020NameFinder()
         iterset.visit(node.iter)
         iterset_names = set(iterset.names)
 
@@ -776,6 +776,22 @@ class NameFinder(ast.NodeVisitor):
         for elem in node:
             super().visit(elem)
         return node
+
+
+class B020NameFinder(NameFinder):
+    """Ignore names defined within the local scope of a comprehension."""
+
+    def visit_GeneratorExp(self, node):
+        self.visit(node.generators)
+
+    def visit_ListComp(self, node):
+        self.visit(node.generators)
+
+    def visit_DictComp(self, node):
+        self.visit(node.generators)
+
+    def visit_comprehension(self, node):
+        self.visit(node.iter)
 
 
 error = namedtuple("error", "lineno col message type vars")
