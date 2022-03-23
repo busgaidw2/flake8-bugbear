@@ -279,10 +279,12 @@ MIT
 Change Log
 ----------
 
-<release-tbd>
+22.3.23
 ~~~~~~~~~~
 
-* B006 and B008: Detect function calls at any level of the default expression.
+* B006 and B008: Detect function calls at any level of the default expression (#239)
+* B020: Fix comprehension false postives (#238)
+* Tweak B019 desc (#237)
 
 22.3.20
 ~~~~~~~~~~
