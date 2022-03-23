@@ -279,6 +279,11 @@ MIT
 Change Log
 ----------
 
+<release-tbd>
+~~~~~~~~~~
+
+* B006 and B008: Detect function calls at any level of the default expression.
+
 22.3.20
 ~~~~~~~~~~
 
