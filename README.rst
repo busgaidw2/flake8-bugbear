@@ -8,6 +8,10 @@ flake8-bugbear
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
 
+.. image:: https://results.pre-commit.ci/badge/github/PyCQA/flake8-bugbear/main.svg
+   :target: https://results.pre-commit.ci/latest/github/PyCQA/flake8-bugbear/main
+   :alt: pre-commit.ci status
+
 A plugin for ``flake8`` finding likely bugs and design problems in your
 program.  Contains warnings that don't belong in ``pyflakes`` and
 ``pycodestyle``::
