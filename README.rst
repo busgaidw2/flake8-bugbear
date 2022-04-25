@@ -279,6 +279,13 @@ MIT
 Change Log
 ----------
 
+22.4.25
+~~~~~~~~~~
+
+* Ignore black formatting for b013 test case (#251)
+* B010 Fix lambda flase positive (#246)
+* B008 Fix edge case with lambda functions (#243)
+
 22.3.23
 ~~~~~~~~~~
 
