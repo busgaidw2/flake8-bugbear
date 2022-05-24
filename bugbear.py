@@ -824,6 +824,11 @@ class B020NameFinder(NameFinder):
     def visit_comprehension(self, node):
         self.visit(node.iter)
 
+    def visit_Lambda(self, node):
+        self.visit(node.body)
+        for lambda_arg in node.args.args:
+            self.names.pop(lambda_arg.arg, None)
+
 
 error = namedtuple("error", "lineno col message type vars")
 Error = partial(partial, error, type=BugBearChecker, vars=())
