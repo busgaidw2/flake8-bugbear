@@ -154,6 +154,8 @@ positives due to similarly named user-defined functions.
 the loop, because `late-binding closures are a classic gotcha
 <https://docs.python-guide.org/writing/gotchas/#late-binding-closures>`__.
 
+**B024**: Abstract base class with no abstract method. Remember to use @abstractmethod, @abstractclassmethod, and/or @abstractproperty decorators.
+
 Opinionated warnings
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -281,6 +283,11 @@ MIT
 
 Change Log
 ----------
+
+FUTURE
+~~~~~~~~~~
+* Add B024: abstract base class with no abstract methods (#273)
+
 
 22.7.1
 ~~~~~~~~~~

@@ -416,6 +416,7 @@ class BugBearVisitor(ast.NodeVisitor):
         self.check_for_b903(node)
         self.check_for_b018(node)
         self.check_for_b021(node)
+        self.check_for_b024(node)
         self.generic_visit(node)
 
     def visit_Try(self, node):
@@ -607,6 +608,37 @@ class BugBearVisitor(ast.NodeVisitor):
         for err in sorted(suspicious_variables):
             if reassigned_in_loop.issuperset(err.vars):
                 self.errors.append(err)
+
+    def check_for_b024(self, node: ast.ClassDef):
+        """Check for inheritance from abstract classes in abc and lack of
+        any methods decorated with abstract*"""
+
+        def is_abc_class(value):
+            if isinstance(value, ast.keyword):
+                return value.arg == "metaclass" and is_abc_class(value.value)
+            abc_names = ("ABC", "ABCMeta")
+            return (isinstance(value, ast.Name) and value.id in abc_names) or (
+                isinstance(value, ast.Attribute)
+                and value.attr in abc_names
+                and isinstance(value.value, ast.Name)
+                and value.value.id == "abc"
+            )
+
+        def is_abstract_decorator(expr):
+            return (isinstance(expr, ast.Name) and expr.id[:8] == "abstract") or (
+                isinstance(expr, ast.Attribute) and expr.attr[:8] == "abstract"
+            )
+
+        if not any(map(is_abc_class, (*node.bases, *node.keywords))):
+            return
+
+        for stmt in node.body:
+            if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)) and any(
+                map(is_abstract_decorator, stmt.decorator_list)
+            ):
+                return
+
+        self.errors.append(B024(node.lineno, node.col_offset, vars=(node.name,)))
 
     def _get_assigned_names(self, loop_node):
         loop_targets = (ast.For, ast.AsyncFor, ast.comprehension)
@@ -1139,6 +1171,12 @@ B022 = Error(
 )
 
 B023 = Error(message="B023 Function definition does not bind loop variable {!r}.")
+B024 = Error(
+    message=(
+        "{} is an abstract base class, but it has no abstract methods. Remember to use"
+        " @abstractmethod, @abstractclassmethod and/or @abstractproperty decorators."
+    )
+)
 
 # Warnings disabled by default.
 B901 = Error(
