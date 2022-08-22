@@ -284,8 +284,9 @@ MIT
 Change Log
 ----------
 
-FUTURE
+22.8.22
 ~~~~~~~~~~
+
 * Add B024: abstract base class with no abstract methods (#273)
 
 
