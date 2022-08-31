@@ -418,7 +418,7 @@ class BugBearVisitor(ast.NodeVisitor):
         self.check_for_b903(node)
         self.check_for_b018(node)
         self.check_for_b021(node)
-        self.check_for_b024(node)
+        self.check_for_b024_and_b027(node)
         self.generic_visit(node)
 
     def visit_Try(self, node):
@@ -612,7 +612,7 @@ class BugBearVisitor(ast.NodeVisitor):
             if reassigned_in_loop.issuperset(err.vars):
                 self.errors.append(err)
 
-    def check_for_b024(self, node: ast.ClassDef):
+    def check_for_b024_and_b027(self, node: ast.ClassDef):
         """Check for inheritance from abstract classes in abc and lack of
         any methods decorated with abstract*"""
 
@@ -632,16 +632,45 @@ class BugBearVisitor(ast.NodeVisitor):
                 isinstance(expr, ast.Attribute) and expr.attr[:8] == "abstract"
             )
 
+        def empty_body(body) -> bool:
+            # Function body consist solely of `pass`, `...`, and/or (doc)string literals
+            return all(
+                isinstance(stmt, ast.Pass)
+                or (
+                    isinstance(stmt, ast.Expr)
+                    and isinstance(stmt.value, ast.Constant)
+                    and (
+                        stmt.value.value is Ellipsis
+                        or isinstance(stmt.value.value, str)
+                    )
+                )
+                for stmt in body
+            )
+
+        # only check abstract classes
         if not any(map(is_abc_class, (*node.bases, *node.keywords))):
             return
 
-        for stmt in node.body:
-            if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)) and any(
-                map(is_abstract_decorator, stmt.decorator_list)
-            ):
-                return
+        has_abstract_method = False
 
-        self.errors.append(B024(node.lineno, node.col_offset, vars=(node.name,)))
+        for stmt in node.body:
+            # only check function defs
+            if not isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+
+            has_abstract_decorator = any(
+                map(is_abstract_decorator, stmt.decorator_list)
+            )
+
+            has_abstract_method |= has_abstract_decorator
+
+            if not has_abstract_decorator and empty_body(stmt.body):
+                self.errors.append(
+                    B025(stmt.lineno, stmt.col_offset, vars=(stmt.name,))
+                )
+
+        if not has_abstract_method:
+            self.errors.append(B024(node.lineno, node.col_offset, vars=(node.name,)))
 
     def check_for_b026(self, call: ast.Call):
         if not call.keywords:
@@ -1211,8 +1240,8 @@ B023 = Error(message="B023 Function definition does not bind loop variable {!r}.
 B024 = Error(
     message=(
         "B024 {} is an abstract base class, but it has no abstract methods. Remember to"
-        " use @abstractmethod, @abstractclassmethod and/or @abstractproperty"
-        " decorators."
+        " use the @abstractmethod decorator, potentially in conjunction with"
+        " @classmethod, @property and/or @staticmethod."
     )
 )
 B025 = Error(
@@ -1227,6 +1256,12 @@ B026 = Error(
         "because it only works when the keyword parameter is declared after all "
         "parameters supplied by the unpacked sequence, and this change of ordering can "
         "surprise and mislead readers."
+    )
+)
+B027 = Error(
+    message=(
+        "B027 {} is an empty method in an abstract base class, but has no abstract"
+        " decorator. Consider adding @abstractmethod."
     )
 )
 

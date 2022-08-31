@@ -16,76 +16,76 @@ B024 - on lines 17, 34, 52, 58, 69, 74, 84, 89
 
 class Base_1(ABC):  # error
     def method(self):
-        ...
+        foo()
 
 
 class Base_2(ABC):
     @abstractmethod
     def method(self):
-        ...
+        foo()
 
 
 class Base_3(ABC):
     @abc.abstractmethod
     def method(self):
-        ...
+        foo()
 
 
 class Base_4(ABC):
     @notabc.abstractmethod
     def method(self):
-        ...
+        foo()
 
 
 class Base_5(ABC):
     @abstract
     def method(self):
-        ...
+        foo()
 
 
 class Base_6(ABC):
     @abstractaoeuaoeuaoeu
     def method(self):
-        ...
+        foo()
 
 
 class Base_7(ABC):  # error
     @notabstract
     def method(self):
-        ...
+        foo()
 
 
 class MetaBase_1(metaclass=ABCMeta):  # error
     def method(self):
-        ...
+        foo()
 
 
 class MetaBase_2(metaclass=ABCMeta):
     @abstractmethod
     def method(self):
-        ...
+        foo()
 
 
 class abc_Base_1(abc.ABC):  # error
     def method(self):
-        ...
+        foo()
 
 
 class abc_Base_2(metaclass=abc.ABCMeta):  # error
     def method(self):
-        ...
+        foo()
 
 
 class notabc_Base_1(notabc.ABC):  # safe
     def method(self):
-        ...
+        foo()
 
 
 class multi_super_1(notabc.ABC, abc.ABCMeta):  # error
     def method(self):
-        ...
+        foo()
 
 
 class multi_super_2(notabc.ABC, metaclass=abc.ABCMeta):  # error
     def method(self):
-        ...
+        foo()

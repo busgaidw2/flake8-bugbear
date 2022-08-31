@@ -37,6 +37,7 @@ from bugbear import (
     B024,
     B025,
     B026,
+    B027,
     B901,
     B902,
     B903,
@@ -398,6 +399,19 @@ class BugbearTestCase(unittest.TestCase):
                 B026(21, 25),
             ),
         )
+
+    def test_b027(self):
+        filename = Path(__file__).absolute().parent / "b025.py"
+        bbc = BugBearChecker(filename=str(filename))
+        errors = list(bbc.run())
+        expected = self.errors(
+            B025(13, 4, vars=("empty_1",)),
+            B025(16, 4, vars=("empty_2",)),
+            B025(19, 4, vars=("empty_3",)),
+            B025(23, 4, vars=("empty_4",)),
+            B025(31, 4, vars=("empty_5",)),
+        )
+        self.assertEqual(errors, expected)
 
     def test_b901(self):
         filename = Path(__file__).absolute().parent / "b901.py"
