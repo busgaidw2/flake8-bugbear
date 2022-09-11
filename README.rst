@@ -291,6 +291,11 @@ Change Log
 22.8.23
 ~~~~~~~~~~
 
+* Add B025: Find duplicate except clauses (#284)
+
+22.8.23
+~~~~~~~~~~
+
 * Add B024 error code to message for B024 (#276)
 
 22.8.22
