@@ -354,6 +354,8 @@ class BugBearVisitor(ast.NodeVisitor):
                 ):
                     self.errors.append(B010(node.lineno, node.col_offset))
 
+            self.check_for_b026(node)
+
         self.generic_visit(node)
 
     def visit_Assign(self, node):
@@ -640,6 +642,22 @@ class BugBearVisitor(ast.NodeVisitor):
                 return
 
         self.errors.append(B024(node.lineno, node.col_offset, vars=(node.name,)))
+
+    def check_for_b026(self, call: ast.Call):
+        if not call.keywords:
+            return
+
+        starreds = [arg for arg in call.args if isinstance(arg, ast.Starred)]
+        if not starreds:
+            return
+
+        first_keyword = call.keywords[0].value
+        for starred in starreds:
+            if (starred.lineno, starred.col_offset) > (
+                first_keyword.lineno,
+                first_keyword.col_offset,
+            ):
+                self.errors.append(B026(starred.lineno, starred.col_offset))
 
     def _get_assigned_names(self, loop_node):
         loop_targets = (ast.For, ast.AsyncFor, ast.comprehension)
@@ -1201,6 +1219,14 @@ B025 = Error(
     message=(
         "B025 Exception `{0}` has been caught multiple times. Only the first except"
         " will be considered and all other except catches can be safely removed."
+    )
+)
+B026 = Error(
+    message=(
+        "B026 Star-arg unpacking after a keyword argument is strongly discouraged, "
+        "because it only works when the keyword parameter is declared after all "
+        "parameters supplied by the unpacked sequence, and this change of ordering can "
+        "surprise and mislead readers."
     )
 )
 
