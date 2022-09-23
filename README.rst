@@ -295,10 +295,16 @@ MIT
 Change Log
 ----------
 
-22.8.23
+22.9.23
 ~~~~~~~~~~
 
-* Add B025: Find duplicate except clauses (#284)
+* add B026: find argument unpacking after keyword argument (#287)
+* Move to setup.cfg like flake8 (#288)
+
+22.9.11
+~~~~~~~~~~
+
+* add B025: find duplicate except clauses (#284)
 
 22.8.23
 ~~~~~~~~~~
