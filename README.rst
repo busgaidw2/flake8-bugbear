@@ -296,23 +296,21 @@ MIT
 
 Change Log
 ----------
+Future
+~~~~~~~~~
 
-<<<<<<< HEAD
+* Add B027: Empty method in abstract base class with no abstract decorator
+
 22.9.23
 ~~~~~~~~~~
 
-* add B026: find argument unpacking after keyword argument (#287)
+* Add B026: find argument unpacking after keyword argument (#287)
 * Move to setup.cfg like flake8 (#288)
 
 22.9.11
 ~~~~~~~~~~
 
-* add B025: find duplicate except clauses (#284)
-=======
-Future
-~~~~~~~~~
-* Add B025: Empty method in abstract base class with no abstract decorator.
->>>>>>> 0937a2d (Adding B025: empty method in abstract base class with no abstract decorator)
+* Add B025: find duplicate except clauses (#284)
 
 22.8.23
 ~~~~~~~~~~

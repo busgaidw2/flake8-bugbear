@@ -635,17 +635,17 @@ class BugBearVisitor(ast.NodeVisitor):
             )
 
         def empty_body(body) -> bool:
+            def is_str_or_ellipsis(node):
+                # ast.Ellipsis and ast.Str used in python<3.8
+                return isinstance(node, (ast.Ellipsis, ast.Str)) or (
+                    isinstance(node, ast.Constant)
+                    and (node.value is Ellipsis or isinstance(node.value, str))
+                )
+
             # Function body consist solely of `pass`, `...`, and/or (doc)string literals
             return all(
                 isinstance(stmt, ast.Pass)
-                or (
-                    isinstance(stmt, ast.Expr)
-                    and isinstance(stmt.value, ast.Constant)
-                    and (
-                        stmt.value.value is Ellipsis
-                        or isinstance(stmt.value.value, str)
-                    )
-                )
+                or (isinstance(stmt, ast.Expr) and is_str_or_ellipsis(stmt.value))
                 for stmt in body
             )
 

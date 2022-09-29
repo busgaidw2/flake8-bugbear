@@ -407,7 +407,7 @@ class BugbearTestCase(unittest.TestCase):
             B027(16, 4, vars=("empty_2",)),
             B027(19, 4, vars=("empty_3",)),
             B027(23, 4, vars=("empty_4",)),
-            B027(31, 4, vars=("empty_5",)),
+            B027(31 if sys.version_info >= (3, 8) else 30, 4, vars=("empty_5",)),
         )
         self.assertEqual(errors, expected)
 
