@@ -364,8 +364,6 @@ class BugbearTestCase(unittest.TestCase):
             B024(58, 0, vars=("MetaBase_1",)),
             B024(69, 0, vars=("abc_Base_1",)),
             B024(74, 0, vars=("abc_Base_2",)),
-            B024(84, 0, vars=("multi_super_1",)),
-            B024(89, 0, vars=("multi_super_2",)),
         )
         self.assertEqual(errors, expected)
 
@@ -401,15 +399,15 @@ class BugbearTestCase(unittest.TestCase):
         )
 
     def test_b027(self):
-        filename = Path(__file__).absolute().parent / "b025.py"
+        filename = Path(__file__).absolute().parent / "b027.py"
         bbc = BugBearChecker(filename=str(filename))
         errors = list(bbc.run())
         expected = self.errors(
-            B025(13, 4, vars=("empty_1",)),
-            B025(16, 4, vars=("empty_2",)),
-            B025(19, 4, vars=("empty_3",)),
-            B025(23, 4, vars=("empty_4",)),
-            B025(31, 4, vars=("empty_5",)),
+            B027(13, 4, vars=("empty_1",)),
+            B027(16, 4, vars=("empty_2",)),
+            B027(19, 4, vars=("empty_3",)),
+            B027(23, 4, vars=("empty_4",)),
+            B027(31, 4, vars=("empty_5",)),
         )
         self.assertEqual(errors, expected)
 

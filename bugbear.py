@@ -616,13 +616,15 @@ class BugBearVisitor(ast.NodeVisitor):
         """Check for inheritance from abstract classes in abc and lack of
         any methods decorated with abstract*"""
 
-        def is_abc_class(value):
+        def is_abc_class(value, name="ABC"):
+            # class foo(metaclass = [abc.]ABCMeta)
             if isinstance(value, ast.keyword):
-                return value.arg == "metaclass" and is_abc_class(value.value)
-            abc_names = ("ABC", "ABCMeta")
-            return (isinstance(value, ast.Name) and value.id in abc_names) or (
+                return value.arg == "metaclass" and is_abc_class(value.value, "ABCMeta")
+            # class foo(ABC)
+            # class foo(abc.ABC)
+            return (isinstance(value, ast.Name) and value.id == name) or (
                 isinstance(value, ast.Attribute)
-                and value.attr in abc_names
+                and value.attr == name
                 and isinstance(value.value, ast.Name)
                 and value.value.id == "abc"
             )
@@ -647,6 +649,11 @@ class BugBearVisitor(ast.NodeVisitor):
                 for stmt in body
             )
 
+        # don't check multiple inheritance
+        # https://github.com/PyCQA/flake8-bugbear/issues/277
+        if len(node.bases) + len(node.keywords) > 1:
+            return
+
         # only check abstract classes
         if not any(map(is_abc_class, (*node.bases, *node.keywords))):
             return
@@ -666,7 +673,7 @@ class BugBearVisitor(ast.NodeVisitor):
 
             if not has_abstract_decorator and empty_body(stmt.body):
                 self.errors.append(
-                    B025(stmt.lineno, stmt.col_offset, vars=(stmt.name,))
+                    B027(stmt.lineno, stmt.col_offset, vars=(stmt.name,))
                 )
 
         if not has_abstract_method:

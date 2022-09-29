@@ -81,11 +81,32 @@ class notabc_Base_1(notabc.ABC):  # safe
         foo()
 
 
-class multi_super_1(notabc.ABC, abc.ABCMeta):  # error
+class multi_super_1(notabc.ABC, abc.ABCMeta):  # safe
     def method(self):
         foo()
 
 
-class multi_super_2(notabc.ABC, metaclass=abc.ABCMeta):  # error
+class multi_super_2(notabc.ABC, metaclass=abc.ABCMeta):  # safe
+    def method(self):
+        foo()
+
+
+class non_keyword_abcmeta_1(ABCMeta):  # safe
+    def method(self):
+        foo()
+
+
+class non_keyword_abcmeta_2(abc.ABCMeta):  # safe
+    def method(self):
+        foo()
+
+
+# very invalid code, but that's up to mypy et al to check
+class keyword_abc_1(metaclass=ABC):  # safe
+    def method(self):
+        foo()
+
+
+class keyword_abc_2(metaclass=abc.ABC):  # safe
     def method(self):
         foo()
