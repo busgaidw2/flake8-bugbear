@@ -612,7 +612,7 @@ class BugBearVisitor(ast.NodeVisitor):
             if reassigned_in_loop.issuperset(err.vars):
                 self.errors.append(err)
 
-    def check_for_b024_and_b027(self, node: ast.ClassDef):
+    def check_for_b024_and_b027(self, node: ast.ClassDef):  # noqa: C901
         """Check for inheritance from abstract classes in abc and lack of
         any methods decorated with abstract*"""
 
@@ -661,6 +661,12 @@ class BugBearVisitor(ast.NodeVisitor):
         has_abstract_method = False
 
         for stmt in node.body:
+            # https://github.com/PyCQA/flake8-bugbear/issues/293
+            # Ignore abc's that declares a class attribute that must be set
+            if isinstance(stmt, (ast.AnnAssign, ast.Assign)):
+                has_abstract_method = True
+                continue
+
             # only check function defs
             if not isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 continue

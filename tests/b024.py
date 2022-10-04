@@ -110,3 +110,20 @@ class keyword_abc_1(metaclass=ABC):  # safe
 class keyword_abc_2(metaclass=abc.ABC):  # safe
     def method(self):
         foo()
+
+
+class abc_set_class_variable_1(ABC):  # safe
+    foo: int
+
+
+class abc_set_class_variable_2(ABC):  # safe
+    foo = 2
+
+
+class abc_set_class_variable_3(ABC):  # safe
+    foo: int = 2
+
+
+# this doesn't actually declare a class variable, it's just an expression
+class abc_set_class_variable_4(ABC):  # error
+    foo
