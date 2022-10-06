@@ -154,7 +154,7 @@ positives due to similarly named user-defined functions.
 the loop, because `late-binding closures are a classic gotcha
 <https://docs.python-guide.org/writing/gotchas/#late-binding-closures>`__.
 
-**B024**: Abstract base class with no abstract method. Remember to use @abstractmethod, @abstractclassmethod, and/or @abstractproperty decorators.
+**B024**: Abstract base class with no abstract method. You might have forgotten to add @abstractmethod.
 
 **B025**: ``try-except`` block with duplicate exceptions found.
 This check identifies exception types that are specified in multiple ``except``
@@ -166,6 +166,8 @@ the unpacked sequence, and this change of ordering can surprise and mislead read
 There was `cpython discussion of disallowing this syntax
 <https://github.com/python/cpython/issues/82741>`_, but legacy usage and parser
 limitations make it difficult.
+
+**B027**: Empty method in abstract base class, but has no abstract decorator. Consider adding @abstractmethod.
 
 Opinionated warnings
 ~~~~~~~~~~~~~~~~~~~~
@@ -294,17 +296,21 @@ MIT
 
 Change Log
 ----------
+Future
+~~~~~~~~~
+
+* Add B027: Empty method in abstract base class with no abstract decorator
 
 22.9.23
 ~~~~~~~~~~
 
-* add B026: find argument unpacking after keyword argument (#287)
+* Add B026: find argument unpacking after keyword argument (#287)
 * Move to setup.cfg like flake8 (#288)
 
 22.9.11
 ~~~~~~~~~~
 
-* add B025: find duplicate except clauses (#284)
+* Add B025: find duplicate except clauses (#284)
 
 22.8.23
 ~~~~~~~~~~

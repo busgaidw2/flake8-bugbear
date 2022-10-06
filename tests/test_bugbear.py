@@ -37,6 +37,7 @@ from bugbear import (
     B024,
     B025,
     B026,
+    B027,
     B901,
     B902,
     B903,
@@ -363,8 +364,7 @@ class BugbearTestCase(unittest.TestCase):
             B024(58, 0, vars=("MetaBase_1",)),
             B024(69, 0, vars=("abc_Base_1",)),
             B024(74, 0, vars=("abc_Base_2",)),
-            B024(84, 0, vars=("multi_super_1",)),
-            B024(89, 0, vars=("multi_super_2",)),
+            B024(128, 0, vars=("abc_set_class_variable_4",)),
         )
         self.assertEqual(errors, expected)
 
@@ -398,6 +398,19 @@ class BugbearTestCase(unittest.TestCase):
                 B026(21, 25),
             ),
         )
+
+    def test_b027(self):
+        filename = Path(__file__).absolute().parent / "b027.py"
+        bbc = BugBearChecker(filename=str(filename))
+        errors = list(bbc.run())
+        expected = self.errors(
+            B027(13, 4, vars=("empty_1",)),
+            B027(16, 4, vars=("empty_2",)),
+            B027(19, 4, vars=("empty_3",)),
+            B027(23, 4, vars=("empty_4",)),
+            B027(31 if sys.version_info >= (3, 8) else 30, 4, vars=("empty_5",)),
+        )
+        self.assertEqual(errors, expected)
 
     def test_b901(self):
         filename = Path(__file__).absolute().parent / "b901.py"
