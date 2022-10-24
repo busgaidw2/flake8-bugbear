@@ -296,10 +296,16 @@ MIT
 
 Change Log
 ----------
-Future
+
+22.10.25
 ~~~~~~~~~
 
+* Make B015 and B018 messages slightly more polite (#298)
 * Add B027: Empty method in abstract base class with no abstract decorator
+* Multiple B024 false positive fixes
+* Move CI to use `tox` (#294)
+* Move to using PEP621 / `pyproject.toml` package (#291)
+* Tested in 3.11
 
 22.9.23
 ~~~~~~~~~~
