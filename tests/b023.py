@@ -121,6 +121,14 @@ for x in range(2):
     max(range(3), key=lambda y: x * y)
     sorted(range(3), key=lambda y: x * y)
 
+    any(map(lambda y: x < y, range(3)))
+    all(map(lambda y: x < y, range(3)))
+    set(map(lambda y: x < y, range(3)))
+    list(map(lambda y: x < y, range(3)))
+    tuple(map(lambda y: x < y, range(3)))
+    sorted(map(lambda y: x < y, range(3)))
+    frozenset(map(lambda y: x < y, range(3)))
+
     any(filter(lambda y: x < y, range(3)))
     all(filter(lambda y: x < y, range(3)))
     set(filter(lambda y: x < y, range(3)))
@@ -156,7 +164,7 @@ def iter_f(names):
             return lambda: name if exists(name) else None
 
         if foo(name):
-            return [lambda: name]  # false alarm, should be fixed?
+            return [lambda: name]  # known false alarm
 
         if False:
             return [lambda: i for i in range(3)]  # error

@@ -592,7 +592,7 @@ class BugBearVisitor(ast.NodeVisitor):
                 # check for filter&reduce
                 if (
                     isinstance(node.func, ast.Name)
-                    and node.func.id in ("filter", "reduce")
+                    and node.func.id in ("filter", "reduce", "map")
                 ) or (
                     isinstance(node.func, ast.Attribute)
                     and node.func.attr == "reduce"
@@ -610,11 +610,14 @@ class BugBearVisitor(ast.NodeVisitor):
                     ):
                         safe_functions.append(keyword.value)
 
+            # mark `return lambda: x` as safe
+            # does not (currently) check inner lambdas in a returned expression
+            # e.g. `return (lambda: x, )
             if isinstance(node, ast.Return):
                 if isinstance(node.value, FUNCTION_NODES):
                     safe_functions.append(node.value)
-                # TODO: ast.walk(node) and mark all child nodes safe?
 
+            # find unsafe functions
             if isinstance(node, FUNCTION_NODES) and node not in safe_functions:
                 argnames = {
                     arg.arg for arg in ast.walk(node.args) if isinstance(arg, ast.arg)
