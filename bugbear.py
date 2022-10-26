@@ -669,6 +669,14 @@ class BugBearVisitor(ast.NodeVisitor):
                 isinstance(expr, ast.Attribute) and expr.attr[:8] == "abstract"
             )
 
+        def is_overload(expr):
+            return (isinstance(expr, ast.Name) and expr.id == "overload") or (
+                isinstance(expr, ast.Attribute)
+                and isinstance(expr.value, ast.Name)
+                and expr.value.id == "typing"
+                and expr.attr == "overload"
+            )
+
         def empty_body(body) -> bool:
             def is_str_or_ellipsis(node):
                 # ast.Ellipsis and ast.Str used in python<3.8
@@ -712,7 +720,11 @@ class BugBearVisitor(ast.NodeVisitor):
 
             has_abstract_method |= has_abstract_decorator
 
-            if not has_abstract_decorator and empty_body(stmt.body):
+            if (
+                not has_abstract_decorator
+                and empty_body(stmt.body)
+                and not any(map(is_overload, stmt.decorator_list))
+            ):
                 self.errors.append(
                     B027(stmt.lineno, stmt.col_offset, vars=(stmt.name,))
                 )

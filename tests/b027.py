@@ -5,7 +5,7 @@ from abc import abstractmethod as notabstract
 
 """
 Should emit:
-B025 - on lines 13, 16, 19, 23, 31
+B027 - on lines 13, 16, 19, 23, 31
 """
 
 
@@ -57,3 +57,22 @@ class NonAbstractClass:
 
     def empty_2(self):  # safe
         pass
+
+
+# ignore @overload, fixes issue #304
+import typing
+from typing import Union, overload
+
+
+class AstractClass(ABC):
+    @overload
+    def empty_1(self, foo: str):
+        ...
+
+    @typing.overload
+    def empty_1(self, foo: int):
+        ...
+
+    @abstractmethod
+    def empty_1(self, foo: Union[str, int]):
+        ...
