@@ -297,6 +297,13 @@ MIT
 Change Log
 ----------
 
+22.10.27
+~~~~~~~~~
+
+* B027: Ignore @overload decorator (#306)
+* B023: Also fix map (#305)
+* B023: Avoid false alarms with filter, reduce, key= and return. Added tests for functools (#303)
+
 22.10.25
 ~~~~~~~~~
 
