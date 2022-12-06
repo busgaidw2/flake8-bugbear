@@ -200,7 +200,10 @@ or ``raise ... from None`` to distinguish them from errors in exception handling
 See `the exception chaining tutorial <https://docs.python.org/3/tutorial/errors.html#exception-chaining>`_
 for details.
 
-**B905**: `zip()` without an explicit `strict=` parameter. Added with python3.10, so don't enable this flag for code that should work on previous versions. https://peps.python.org/pep-0618/
+**B905**: ``zip()`` without an explicit `strict=` parameter set. ``strict=True`` causes the resulting iterator
+to raise a ``ValueError`` if the arguments are exhausted at differing lengths. The ``strict=`` argument
+was added in Python 3.10, so don't enable this flag for code that should work on <3.10.
+For more information: https://peps.python.org/pep-0618/
 
 **B950**: Line too long. This is a pragmatic equivalent of
 ``pycodestyle``'s ``E501``: it considers "max-line-length" but only triggers
