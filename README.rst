@@ -302,10 +302,11 @@ MIT
 Change Log
 ----------
 
-Future
+22.12.6
 ~~~~~~~~~
-* B027: ignore @overload when typing is imported with other names
-* Add B905: `zip()` without an explicit `strict=` parameter.
+
+* Add B905: `zip()` without an explicit `strict=` parameter. (#314)
+* B027: ignore @overload when typing is imported with other names (#309)
 
 22.10.27
 ~~~~~~~~~
