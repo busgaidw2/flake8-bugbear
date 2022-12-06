@@ -356,6 +356,7 @@ class BugBearVisitor(ast.NodeVisitor):
 
             self.check_for_b026(node)
 
+        self.check_for_b905(node)
         self.generic_visit(node)
 
     def visit_Assign(self, node):
@@ -960,6 +961,14 @@ class BugBearVisitor(ast.NodeVisitor):
         for duplicate in duplicates:
             self.errors.append(B025(node.lineno, node.col_offset, vars=(duplicate,)))
 
+    def check_for_b905(self, node):
+        if (
+            isinstance(node.func, ast.Name)
+            and node.func.id == "zip"
+            and not any(kw.arg == "strict" for kw in node.keywords)
+        ):
+            self.errors.append(B905(node.lineno, node.col_offset))
+
 
 def compose_call_path(node):
     if isinstance(node, ast.Attribute):
@@ -1360,6 +1369,8 @@ B904 = Error(
     )
 )
 
+B905 = Error(message="B905 `zip()` without an explicit `strict=` parameter.")
+
 B950 = Error(message="B950 line too long ({} > {} characters)")
 
-disabled_by_default = ["B901", "B902", "B903", "B904", "B950"]
+disabled_by_default = ["B901", "B902", "B903", "B904", "B905", "B950"]

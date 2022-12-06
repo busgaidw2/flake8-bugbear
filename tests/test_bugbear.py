@@ -42,6 +42,7 @@ from bugbear import (
     B902,
     B903,
     B904,
+    B905,
     B950,
     BugBearChecker,
     BugBearVisitor,
@@ -297,7 +298,7 @@ class BugbearTestCase(unittest.TestCase):
     def test_b020(self):
         filename = Path(__file__).absolute().parent / "b020.py"
         bbc = BugBearChecker(filename=str(filename))
-        errors = list(bbc.run())
+        errors = list(e for e in bbc.run() if e[2][:4] == "B020")
         self.assertEqual(
             errors,
             self.errors(
@@ -481,6 +482,22 @@ class BugbearTestCase(unittest.TestCase):
             B904(11, 4),
             B904(16, 4),
             B904(55, 16),
+        ]
+        self.assertEqual(errors, self.errors(*expected))
+
+    @unittest.skipIf(sys.version_info < (3, 10), "requires 3.10+")
+    def test_b905(self):
+        filename = Path(__file__).absolute().parent / "b905_py310.py"
+        bbc = BugBearChecker(filename=str(filename))
+        errors = list(bbc.run())
+        expected = [
+            B905(1, 0),
+            B905(2, 0),
+            B905(3, 0),
+            B905(4, 0),
+            B905(4, 15),
+            B905(5, 4),
+            B905(6, 0),
         ]
         self.assertEqual(errors, self.errors(*expected))
 
