@@ -514,6 +514,7 @@ class BugBearVisitor(ast.NodeVisitor):
 
     def check_for_b017(self, node):
         """Checks for use of the evil syntax 'with assertRaises(Exception):'
+        or 'with pytest.raises(Exception)'.
 
         This form of assertRaises will catch everything that subclasses
         Exception, which happens to be the vast majority of Python internal
@@ -523,10 +524,21 @@ class BugBearVisitor(ast.NodeVisitor):
         """
         item = node.items[0]
         item_context = item.context_expr
+
         if (
             hasattr(item_context, "func")
-            and hasattr(item_context.func, "attr")
-            and item_context.func.attr == "assertRaises"
+            and (
+                (
+                    hasattr(item_context.func, "attr")
+                    and item_context.func.attr == "assertRaises"
+                )
+                or (
+                    isinstance(item_context.func, ast.Attribute)
+                    and item_context.func.attr == "raises"
+                    and isinstance(item_context.func.value, ast.Name)
+                    and item_context.func.value.id == "pytest"
+                )
+            )
             and len(item_context.args) == 1
             and isinstance(item_context.args[0], ast.Name)
             and item_context.args[0].id == "Exception"
@@ -1282,11 +1294,11 @@ B016 = Error(
 )
 B017 = Error(
     message=(
-        "B017 assertRaises(Exception): should be considered evil. "
-        "It can lead to your test passing even if the code being tested is "
-        "never executed due to a typo. Either assert for a more specific "
-        "exception (builtin or custom), use assertRaisesRegex, or use the "
-        "context manager form of assertRaises."
+        "B017 assertRaises(Exception): or pytest.raises(Exception) should "
+        "be considered evil. It can lead to your test passing even if the "
+        "code being tested is never executed due to a typo. Either assert "
+        "for a more specific exception (builtin or custom), use "
+        "assertRaisesRegex, or use the context manager form of assertRaises."
     )
 )
 B018 = Error(
