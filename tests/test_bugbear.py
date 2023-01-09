@@ -1,4 +1,5 @@
 import ast
+import itertools
 import os
 import site
 import subprocess
@@ -38,6 +39,7 @@ from bugbear import (
     B025,
     B026,
     B027,
+    B028,
     B901,
     B902,
     B903,
@@ -428,6 +430,106 @@ class BugbearTestCase(unittest.TestCase):
             B027(31 if sys.version_info >= (3, 8) else 30, 4, vars=("empty_5",)),
         )
         self.assertEqual(errors, expected)
+
+    @unittest.skipIf(sys.version_info < (3, 8), "not implemented for <3.8")
+    def test_b028(self):
+        filename = Path(__file__).absolute().parent / "b028.py"
+        bbc = BugBearChecker(filename=str(filename))
+        errors = list(bbc.run())
+        expected = self.errors(
+            B028(8, 0, vars=("var",)),
+            B028(9, 0, vars=("var",)),
+            B028(10, 0, vars=("var",)),
+            B028(12, 0, vars=("var",)),
+            B028(13, 0, vars=("var",)),
+            B028(14, 0, vars=("var",)),
+            B028(16, 0, vars=("'hello'",)),
+            B028(17, 0, vars=("foo()",)),
+            B028(20, 5, vars=("var",)),
+            B028(25, 5, vars=("var",)),
+            B028(31, 0, vars=("var",)),
+            B028(32, 0, vars=("var",)),
+            B028(33, 0, vars=("var",)),
+            B028(33, 0, vars=("var2",)),
+            B028(34, 0, vars=("var",)),
+            B028(34, 0, vars=("var2",)),
+            B028(35, 0, vars=("var",)),
+            B028(35, 0, vars=("var2",)),
+            B028(38, 0, vars=("var2",)),
+            B028(41, 0, vars=("var",)),
+            B028(42, 0, vars=("var.__str__",)),
+            B028(43, 0, vars=("var.__str__.__repr__",)),
+            B028(44, 0, vars=("3 + 5" if sys.version_info >= (3, 9) else "BinOp",)),
+            B028(45, 0, vars=("foo()",)),
+            B028(46, 0, vars=("None",)),
+            B028(47, 0, vars=("..." if sys.version_info >= (3, 9) else "Ellipsis",)),
+            B028(48, 0, vars=("True",)),
+            B028(51, 0, vars=("var",)),
+            B028(52, 0, vars=("var",)),
+            B028(53, 0, vars=("var",)),
+            B028(54, 0, vars=("var",)),
+            B028(57, 0, vars=("var",)),
+            B028(60, 0, vars=("var",)),
+            B028(64, 0, vars=("var",)),
+            B028(66, 0, vars=("var",)),
+            B028(68, 0, vars=("var",)),
+        )
+        self.assertEqual(errors, expected)
+
+    # manual permutations to save overhead when doing >60k permutations
+    # see format spec at
+    # https://docs.python.org/3/library/string.html#format-specification-mini-language
+    @unittest.skipIf(sys.version_info < (3, 8), "not implemented for <3.8")
+    def test_b028_format_specifier_permutations(self):
+        visitor = BugBearVisitor(filename="", lines="")
+
+        for fields in itertools.product(
+            (None, "x"),  # fill (any character)
+            (None, *"<>=^"),  # align
+            (None, *"+- "),  # sign
+            (None, "z"),  # z_letter
+            (None, "#"),  # pound_sign
+            (None, "0"),  # zero
+            (None, *"19"),  # width
+            (None, *"_,"),  # grouping_option
+            (None, ".8"),  # precision
+            (None, *"bcdeEfFgGnosxX%"),  # type_
+        ):
+            format_spec = "".join(f for f in fields if f is not None)
+
+            # directly interact with a visitor to save on runtime
+            bbc_string = "f'\"{var:" + format_spec + "}\"'"
+            tree = ast.parse(bbc_string)
+            visitor.errors = []
+            visitor.visit(tree)
+
+            format_string = "'{:" + format_spec + "}'"
+            try:
+                old = format_string.format("hello")
+            except ValueError:
+                assert (
+                    visitor.errors == []
+                ), f"b028 raised for {format_spec!r} not valid for string"
+                continue
+
+            new = ("{!r:" + format_spec + "}").format("hello")
+
+            # Preceding the width field by 0 in >=3.10 is valid, but does nothing.
+            # The presence of it means likely numeric variable though.
+            # A width shorter than the string will look the same, but should not give b028.
+            if fields[5] == "0" or fields[6] == "1":
+                assert (
+                    visitor.errors == []
+                ), f"b028 should not raise on questionable case {format_spec}"
+            elif old == new:
+                assert visitor.errors, (
+                    f"b028 not raised for {format_spec} that would look identical"
+                    " with !r"
+                )
+            else:
+                assert (
+                    visitor.errors == []
+                ), f"b028 raised for {format_spec} that would look different with !r"
 
     def test_b901(self):
         filename = Path(__file__).absolute().parent / "b901.py"
