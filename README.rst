@@ -169,6 +169,8 @@ limitations make it difficult.
 
 **B027**: Empty method in abstract base class, but has no abstract decorator. Consider adding @abstractmethod.
 
+**B028**: Consider replacing ``f"'{foo}'"`` with ``f"{foo!r}"`` which is both easier to read and will escape quotes inside ``foo`` if that would appear. The check tries to filter out any format specs that are invalid together with ``!r``. If you're using other conversion flags then e.g. ``f"'{foo!a}'"`` can be replaced with ``f"{ascii(foo)!r}"``. Not currently implemented for python<3.8 or ``str.format()`` calls.
+
 Opinionated warnings
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -310,6 +312,7 @@ Future
 ~~~~~~~~~
 
 * Add B906: ``visit_`` function with no further calls to a ``visit`` function. (#313)
+* Add B028: Suggest ``!r`` when formatted value in f-string is surrounded by quotes. (#319)
 
 22.12.6
 ~~~~~~~~~

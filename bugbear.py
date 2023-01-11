@@ -4,6 +4,7 @@ import itertools
 import logging
 import math
 import re
+import sys
 from collections import namedtuple
 from contextlib import suppress
 from functools import lru_cache, partial
@@ -446,6 +447,10 @@ class BugBearVisitor(ast.NodeVisitor):
     def visit_With(self, node):
         self.check_for_b017(node)
         self.check_for_b022(node)
+        self.generic_visit(node)
+
+    def visit_JoinedStr(self, node):
+        self.check_for_b028(node)
         self.generic_visit(node)
 
     def check_for_b005(self, node):
@@ -1009,6 +1014,116 @@ class BugBearVisitor(ast.NodeVisitor):
         else:
             self.errors.append(B906(node.lineno, node.col_offset))
 
+    def check_for_b028(self, node: ast.JoinedStr):  # noqa: C901
+        # AST structure of strings in f-strings in 3.7 is different enough this
+        # implementation doesn't work
+        if sys.version_info <= (3, 7):
+            return  # pragma: no cover
+
+        def myunparse(node: ast.AST) -> str:  # pragma: no cover
+            if sys.version_info >= (3, 9):
+                return ast.unparse(node)
+            if isinstance(node, ast.Name):
+                return node.id
+            if isinstance(node, ast.Attribute):
+                return myunparse(node.value) + "." + node.attr
+            if isinstance(node, ast.Constant):
+                return repr(node.value)
+            if isinstance(node, ast.Call):
+                return myunparse(node.func) + "()"  # don't bother with arguments
+
+            # as a last resort, just give the type name
+            return type(node).__name__
+
+        quote_marks = "'\""
+        current_mark = None
+        variable = None
+        for value in node.values:
+            # check for quote mark after pre-marked variable
+            if (
+                current_mark is not None
+                and variable is not None
+                and isinstance(value, ast.Constant)
+                and isinstance(value.value, str)
+                and value.value[0] == current_mark
+            ):
+                self.errors.append(
+                    B028(
+                        variable.lineno,
+                        variable.col_offset,
+                        vars=(myunparse(variable.value),),
+                    )
+                )
+                current_mark = variable = None
+                # don't continue with length>1, so we can detect a new pre-mark
+                # in the same string as a post-mark, e.g. `"{foo}" "{bar}"`
+                if len(value.value) == 1:
+                    continue
+
+            # detect pre-mark
+            if (
+                isinstance(value, ast.Constant)
+                and isinstance(value.value, str)
+                and value.value[-1] in quote_marks
+            ):
+                current_mark = value.value[-1]
+                variable = None
+                continue
+
+            # detect variable, if there's a pre-mark
+            if (
+                current_mark is not None
+                and variable is None
+                and isinstance(value, ast.FormattedValue)
+                and value.conversion != ord("r")
+            ):
+                # check if the format spec shows that this is numeric
+                # or otherwise hard/impossible to convert to `!r`
+                if (
+                    isinstance(value.format_spec, ast.JoinedStr)
+                    and value.format_spec.values  # empty format spec is fine
+                ):
+                    if (
+                        # if there's variables in the format_spec, skip
+                        len(value.format_spec.values) > 1
+                        or not isinstance(value.format_spec.values[0], ast.Constant)
+                    ):
+                        current_mark = variable = None
+                        continue
+                    format_specifier = value.format_spec.values[0].value
+
+                    # if second character is an align, first character is a fill
+                    # char - strip it
+                    if len(format_specifier) > 1 and format_specifier[1] in "<>=^":
+                        format_specifier = format_specifier[1:]
+
+                    # strip out precision digits, so the only remaining ones are
+                    # width digits, which will misplace the quotes
+                    format_specifier = re.sub(r"\.\d*", "", format_specifier)
+
+                    # skip if any invalid characters in format spec
+                    invalid_characters = "".join(
+                        (
+                            "=",  # align character only valid for numerics
+                            "+- ",  # sign
+                            "0123456789",  # width digits
+                            "z",  # coerce negative zero floating point to positive
+                            "#",  # alternate form
+                            "_,",  # thousands grouping
+                            "bcdeEfFgGnoxX%",  # various number specifiers
+                        )
+                    )
+                    if set(format_specifier).intersection(invalid_characters):
+                        current_mark = variable = None
+                        continue
+
+                # otherwise save value as variable
+                variable = value
+                continue
+
+            # if no pre-mark or variable detected, reset state
+            current_mark = variable = None
+
 
 def compose_call_path(node):
     if isinstance(node, ast.Attribute):
@@ -1368,6 +1483,12 @@ B027 = Error(
     message=(
         "B027 {} is an empty method in an abstract base class, but has no abstract"
         " decorator. Consider adding @abstractmethod."
+    )
+)
+B028 = Error(
+    message=(
+        "B028 {!r} is manually surrounded by quotes, consider using the `!r` conversion"
+        " flag."
     )
 )
 
