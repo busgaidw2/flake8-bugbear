@@ -308,7 +308,7 @@ MIT
 Change Log
 ----------
 
-Future
+23.1.14
 ~~~~~~~~~
 
 * Add B906: ``visit_`` function with no further calls to a ``visit`` function. (#313)
