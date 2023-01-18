@@ -308,8 +308,9 @@ MIT
 Change Log
 ----------
 
-Future
+23.1.17
 ~~~~~~~~~
+
 * Rename B028 to B907, making it optional/opinionated.
 
 23.1.14
