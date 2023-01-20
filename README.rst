@@ -311,12 +311,12 @@ MIT
 Change Log
 ----------
 
-Future
+23.1.20
 ~~~~~~~~~
 
-* B024: now ignores classes without any methods.
-* B906: Ignore ``visit_`` functions with a ``_fields`` attribute that can't contain ast.AST subnodes. (#330)
+* B024: now ignores classes without any methods. (#336)
 * B017: Don't warn when ``pytest.raises()`` has a ``match`` argument. (#334)
+* B906: Ignore ``visit_`` functions with a ``_fields`` attribute that can't contain ast.AST subnodes. (#330)
 
 23.1.17
 ~~~~~~~~~

@@ -13,7 +13,7 @@ from keyword import iskeyword
 import attr
 import pycodestyle
 
-__version__ = "23.1.17"
+__version__ = "23.1.20"
 
 LOG = logging.getLogger("flake8.bugbear")
 CONTEXTFUL_NODES = (
