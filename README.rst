@@ -181,6 +181,9 @@ It is therefore recommended to use a stacklevel of 2 or greater to provide more 
 
 **B030**: Except handlers should only be exception classes or tuples of exception classes.
 
+**B031**: Using the generator returned from `itertools.groupby()` more than once will do nothing on the
+second usage. Save the result to a list if the result is needed multiple times.
+
 Opinionated warnings
 ~~~~~~~~~~~~~~~~~~~~
 
