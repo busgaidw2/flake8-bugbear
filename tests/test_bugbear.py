@@ -41,6 +41,7 @@ from bugbear import (
     B027,
     B028,
     B029,
+    B030,
     B901,
     B902,
     B903,
@@ -445,6 +446,16 @@ class BugbearTestCase(unittest.TestCase):
         expected = self.errors(
             B029(8, 0),
             B029(13, 0),
+        )
+        self.assertEqual(errors, expected)
+
+    def test_b030(self):
+        filename = Path(__file__).absolute().parent / "b030.py"
+        bbc = BugBearChecker(filename=str(filename))
+        errors = list(bbc.run())
+        expected = self.errors(
+            B030(8, 0),
+            B030(13, 0),
         )
         self.assertEqual(errors, expected)
 

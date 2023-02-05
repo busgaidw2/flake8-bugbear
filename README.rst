@@ -179,6 +179,8 @@ It is therefore recommended to use a stacklevel of 2 or greater to provide more 
 
 **B029**: Using ``except: ()`` with an empty tuple does not handle/catch anything. Add exceptions to handle.
 
+**B030**: Except handlers should only be exception classes or tuples of exception classes.
+
 Opinionated warnings
 ~~~~~~~~~~~~~~~~~~~~
 
