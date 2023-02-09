@@ -265,6 +265,11 @@ def children_in_scope(node):
             yield from children_in_scope(child)
 
 
+def walk_list(nodes):
+    for node in nodes:
+        yield from ast.walk(node)
+
+
 def _typesafe_issubclass(cls, class_or_tuple):
     try:
         return issubclass(cls, class_or_tuple)
@@ -401,6 +406,7 @@ class BugBearVisitor(ast.NodeVisitor):
         self.check_for_b007(node)
         self.check_for_b020(node)
         self.check_for_b023(node)
+        self.check_for_b031(node)
         self.generic_visit(node)
 
     def visit_AsyncFor(self, node):
@@ -792,6 +798,56 @@ class BugBearVisitor(ast.NodeVisitor):
                 first_keyword.col_offset,
             ):
                 self.errors.append(B026(starred.lineno, starred.col_offset))
+
+    def check_for_b031(self, loop_node):  # noqa: C901
+        """Check that `itertools.groupby` isn't iterated over more than once.
+
+        We emit a warning when the generator returned by `groupby()` is used
+        more than once inside a loop body or when it's used in a nested loop.
+        """
+        # for <loop_node.target> in <loop_node.iter>: ...
+        if isinstance(loop_node.iter, ast.Call):
+            node = loop_node.iter
+            if (isinstance(node.func, ast.Name) and node.func.id in ("groupby",)) or (
+                isinstance(node.func, ast.Attribute)
+                and node.func.attr == "groupby"
+                and isinstance(node.func.value, ast.Name)
+                and node.func.value.id == "itertools"
+            ):
+                # We have an invocation of groupby which is a simple unpacking
+                if isinstance(loop_node.target, ast.Tuple) and isinstance(
+                    loop_node.target.elts[1], ast.Name
+                ):
+                    group_name = loop_node.target.elts[1].id
+                else:
+                    # Ignore any `groupby()` invocation that isn't unpacked
+                    return
+
+                num_usages = 0
+                for node in walk_list(loop_node.body):
+                    # Handled nested loops
+                    if isinstance(node, ast.For):
+                        for nested_node in walk_list(node.body):
+                            assert nested_node != node
+                            if (
+                                isinstance(nested_node, ast.Name)
+                                and nested_node.id == group_name
+                            ):
+                                self.errors.append(
+                                    B031(
+                                        nested_node.lineno,
+                                        nested_node.col_offset,
+                                        vars=(nested_node.id,),
+                                    )
+                                )
+
+                    # Handle multiple uses
+                    if isinstance(node, ast.Name) and node.id == group_name:
+                        num_usages += 1
+                        if num_usages > 1:
+                            self.errors.append(
+                                B031(node.lineno, node.col_offset, vars=(node.id,))
+                            )
 
     def _get_assigned_names(self, loop_node):
         loop_targets = (ast.For, ast.AsyncFor, ast.comprehension)
@@ -1558,7 +1614,16 @@ B029 = Error(
         "anything. Add exceptions to handle."
     )
 )
+
 B030 = Error(message="B030 Except handlers should only be names of exception classes")
+
+B031 = Error(
+    message=(
+        "B031 Using the generator returned from `itertools.groupby()` more than once"
+        " will do nothing on the second usage. Save the result to a list, if the"
+        " result is needed multiple times."
+    )
+)
 
 # Warnings disabled by default.
 B901 = Error(
