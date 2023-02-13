@@ -325,7 +325,7 @@ MIT
 Change Log
 ----------
 
-Future
+23.2.13
 ~~~~~~~~~
 
 * B906: Add ``visit_Bytes``, ``visit_Num`` and ``visit_Str`` to the list of ``visit_*``
