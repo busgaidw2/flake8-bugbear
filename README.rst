@@ -325,14 +325,15 @@ MIT
 Change Log
 ----------
 
-Unreleased
-~~~~~~~~~~
+23.3.12
+~~~~~~~~
 
+* B950: now ignores 'noqa' and 'type: ignore' comments.
 * B005: Do not flag when using the ``strip()`` method on an imported module.
 * B030: Allow calls and starred expressions in except handlers.
 
 23.2.13
-~~~~~~~~~
+~~~~~~~~
 
 * B906: Add ``visit_Bytes``, ``visit_Num`` and ``visit_Str`` to the list of ``visit_*``
   functions that are ignored by the B906 check. The ``ast.Bytes``, ``ast.Num`` and
