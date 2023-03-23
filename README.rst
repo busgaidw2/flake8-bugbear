@@ -325,9 +325,11 @@ MIT
 Change Log
 ----------
 
-Unreleased
+23.3.23
 ~~~~~~~~~~
 
+* flake8-bugbear is now >= 3.8.1 project like flake8>=6.0.0
+  * This has allowed some more modern AST usage cleanup and less CI running etc.
 * B030: Fix crash on certain unusual except handlers (e.g. ``except a[0].b:``)
 
 23.3.12
