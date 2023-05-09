@@ -527,6 +527,10 @@ class BugBearVisitor(ast.NodeVisitor):
         self.check_for_b005(node)
         self.generic_visit(node)
 
+    def visit_Set(self, node):
+        self.check_for_b033(node)
+        self.generic_visit(node)
+
     def check_for_b005(self, node):
         if isinstance(node, ast.Import):
             for name in node.names:
@@ -1346,6 +1350,14 @@ class BugBearVisitor(ast.NodeVisitor):
         ):
             self.errors.append(B032(node.lineno, node.col_offset))
 
+    def check_for_b033(self, node):
+        constants = [
+            item.value
+            for item in filter(lambda x: isinstance(x, ast.Constant), node.elts)
+        ]
+        if len(constants) != len(set(constants)):
+            self.errors.append(B033(node.lineno, node.col_offset))
+
 
 def compose_call_path(node):
     if isinstance(node, ast.Attribute):
@@ -1740,6 +1752,13 @@ B032 = Error(
     message=(
         "B032 Possible unintentional type annotation (using `:`). Did you mean to"
         " assign (using `=`)?"
+    )
+)
+
+B033 = Error(
+    message=(
+        "B033 Sets should not contain duplicate items. Duplicate items will be replaced"
+        " with a single item at runtime."
     )
 )
 

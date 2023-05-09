@@ -186,6 +186,8 @@ second usage. Save the result to a list if the result is needed multiple times.
 
 **B032**: Possible unintentional type annotation (using ``:``). Did you mean to assign (using ``=``)?
 
+**B033**: Sets should not contain duplicate items. Duplicate items will be replaced with a single item at runtime.
+
 Opinionated warnings
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -337,6 +339,7 @@ Unreleased
 * flake8-bugbear is now >= 3.8.1 project like flake8>=6.0.0
   * This has allowed some more modern AST usage cleanup and less CI running etc.
 * B030: Fix crash on certain unusual except handlers (e.g. ``except a[0].b:``)
+* Add B033: Check for duplicate items in sets.
 
 23.3.12
 ~~~~~~~~
