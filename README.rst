@@ -329,9 +329,13 @@ MIT
 Change Log
 ----------
 
-Unreleased
-~~~~~~~~~~
-* B028: Allow stacklevel to be explicitly assigned as a positional argument
+23.5.9
+~~~~~~
+
+* Add B033: Detect duplicate items in sets
+* Add B908: Detect assertRauses like contexts only has top level statements that could throw
+* Add B028: Allow stacklevel to be explicitly assigned as a positional argument
+* Remove more < 3.8 checks / assertions
 
 23.3.23
 ~~~~~~~~~~
