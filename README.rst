@@ -329,6 +329,12 @@ MIT
 Change Log
 ----------
 
+23.6.5
+~~~~~~
+
+* Include tox.ini in MANIFEST.in for sdist. (#389)
+* Improve B033 (duplicate set items) (#385)
+
 23.5.9
 ~~~~~~
 
