@@ -423,8 +423,9 @@ class BugBearVisitor(ast.NodeVisitor):
 
             self.check_for_b026(node)
 
-        self.check_for_b905(node)
         self.check_for_b028(node)
+        self.check_for_b034(node)
+        self.check_for_b905(node)
         self.generic_visit(node)
 
     def visit_Module(self, node):
@@ -1400,6 +1401,27 @@ class BugBearVisitor(ast.NodeVisitor):
             else:
                 seen.add(elt.value)
 
+    def check_for_b034(self, node: ast.Call):
+        if not isinstance(node.func, ast.Attribute):
+            return
+        if not isinstance(node.func.value, ast.Name) or node.func.value.id != "re":
+            return
+
+        def check(num_args, param_name):
+            if len(node.args) > num_args:
+                self.errors.append(
+                    B034(
+                        node.args[num_args].lineno,
+                        node.args[num_args].col_offset,
+                        vars=(node.func.attr, param_name),
+                    )
+                )
+
+        if node.func.attr in ("sub", "subn"):
+            check(3, "count")
+        elif node.func.attr == "split":
+            check(2, "maxsplit")
+
 
 def compose_call_path(node):
     if isinstance(node, ast.Attribute):
@@ -1801,6 +1823,13 @@ B033 = Error(
     message=(
         "B033 Set should not contain duplicate item {}. Duplicate items will be"
         " replaced with a single item at runtime."
+    )
+)
+
+B034 = Error(
+    message=(
+        "B034 {} should pass `{}` and `flags` as keyword arguments to avoid confusion"
+        " due to unintuitive argument positions."
     )
 )
 
