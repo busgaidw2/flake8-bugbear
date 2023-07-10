@@ -334,13 +334,13 @@ MIT
 Change Log
 ----------
 
-Unreleased
+23.7.10
 ~~~~~~~~~~
 
+* Add B034: re.sub/subn/split must pass flags/count/maxsplit as keyword arguments.
 * Fix a crash and several test failures on Python 3.12, all relating to the B907
   check.
 * Declare support for Python 3.12.
-* Add B034: re.sub/subn/split must pass flags/count/maxsplit as keyword arguments.
 
 23.6.5
 ~~~~~~
