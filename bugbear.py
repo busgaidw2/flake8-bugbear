@@ -308,7 +308,6 @@ class BugBearVisitor(ast.NodeVisitor):
     filename = attr.ib()
     lines = attr.ib()
     b008_extend_immutable_calls = attr.ib(default=attr.Factory(set))
-    node_stack = attr.ib(default=attr.Factory(list))
     node_window = attr.ib(default=attr.Factory(list))
     errors = attr.ib(default=attr.Factory(list))
     futures = attr.ib(default=attr.Factory(set))
