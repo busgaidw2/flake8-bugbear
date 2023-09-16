@@ -667,6 +667,39 @@ class BugbearTestCase(unittest.TestCase):
             ),
         )
 
+    def test_b902_extended(self):
+        filename = Path(__file__).absolute().parent / "b902_extended.py"
+
+        mock_options = Namespace(
+            classmethod_decorators=["mylibrary.makeclassmethod", "validator"],
+            select=["B902"],
+        )
+        bbc = BugBearChecker(filename=str(filename), options=mock_options)
+        errors = list(bbc.run())
+
+        self.assertEqual(
+            errors,
+            self.errors(
+                B902(5, 22, vars=("'self'", "class", "cls")),
+                B902(8, 28, vars=("'self'", "class", "cls")),
+                B902(11, 30, vars=("'self'", "class", "cls")),
+                B902(14, 27, vars=("'cls'", "instance", "self")),
+                B902(18, 13, vars=("'cls'", "instance", "self")),
+                B902(22, 13, vars=("'cls'", "instance", "self")),
+                B902(26, 13, vars=("'cls'", "instance", "self")),
+                B902(30, 13, vars=("'cls'", "instance", "self")),
+                # metaclass
+                B902(59, 22, vars=("'cls'", "metaclass class", "metacls")),
+                B902(62, 28, vars=("'cls'", "metaclass class", "metacls")),
+                B902(65, 30, vars=("'cls'", "metaclass class", "metacls")),
+                B902(68, 27, vars=("'metacls'", "metaclass instance", "cls")),
+                B902(72, 13, vars=("'metacls'", "metaclass instance", "cls")),
+                B902(76, 13, vars=("'metacls'", "metaclass instance", "cls")),
+                B902(80, 13, vars=("'metacls'", "metaclass instance", "cls")),
+                B902(84, 13, vars=("'metacls'", "metaclass instance", "cls")),
+            ),
+        )
+
     def test_b902_py38(self):
         filename = Path(__file__).absolute().parent / "b902_py38.py"
         bbc = BugBearChecker(filename=str(filename))

@@ -10,6 +10,7 @@ from collections import namedtuple
 from contextlib import suppress
 from functools import lru_cache, partial
 from keyword import iskeyword
+from typing import Dict, List, Set, Union
 
 import attr
 import pycodestyle
@@ -38,6 +39,8 @@ B908_unittest_methods = {
     "assertWarnsRegex",
 }
 
+B902_default_decorators = {"classmethod", "validator", "root_validator"}
+
 Context = namedtuple("Context", ["node", "stack"])
 
 
@@ -62,10 +65,15 @@ class BugBearChecker:
         else:
             b008_extend_immutable_calls = set()
 
+        b902_classmethod_decorators: set[str] = B902_default_decorators
+        if self.options and hasattr(self.options, "classmethod_decorators"):
+            b902_classmethod_decorators = set(self.options.classmethod_decorators)
+
         visitor = self.visitor(
             filename=self.filename,
             lines=self.lines,
             b008_extend_immutable_calls=b008_extend_immutable_calls,
+            b902_classmethod_decorators=b902_classmethod_decorators,
         )
         visitor.visit(self.tree)
         for e in itertools.chain(visitor.errors, self.gen_line_based_checks()):
@@ -143,6 +151,19 @@ class BugBearChecker:
             default=[],
             help="Skip B008 test for additional immutable calls.",
         )
+        # you cannot register the same option in two different plugins, so we
+        # only register --classmethod-decorators if pep8-naming is not installed
+        if "pep8ext_naming" not in sys.modules.keys():
+            optmanager.add_option(
+                "--classmethod-decorators",
+                comma_separated_list=True,
+                parse_from_config=True,
+                default=B902_default_decorators,
+                help=(
+                    "List of method decorators that should be treated as classmethods"
+                    " by B902"
+                ),
+            )
 
     @lru_cache  # noqa: B019
     def should_warn(self, code):
@@ -308,6 +329,7 @@ class BugBearVisitor(ast.NodeVisitor):
     filename = attr.ib()
     lines = attr.ib()
     b008_extend_immutable_calls = attr.ib(default=attr.Factory(set))
+    b902_classmethod_decorators = attr.ib(default=attr.Factory(set))
     node_window = attr.ib(default=attr.Factory(list))
     errors = attr.ib(default=attr.Factory(list))
     futures = attr.ib(default=attr.Factory(set))
@@ -971,37 +993,51 @@ class BugBearVisitor(ast.NodeVisitor):
                 self.errors.append(B901(return_node.lineno, return_node.col_offset))
                 break
 
-    def check_for_b902(self, node):
+    # taken from pep8-naming
+    @classmethod
+    def find_decorator_name(cls, d):
+        if isinstance(d, ast.Name):
+            return d.id
+        elif isinstance(d, ast.Attribute):
+            return d.attr
+        elif isinstance(d, ast.Call):
+            return cls.find_decorator_name(d.func)
+
+    def check_for_b902(  # noqa: C901 (too complex)
+        self, node: Union[ast.FunctionDef, ast.AsyncFunctionDef]
+    ) -> None:
+        def is_classmethod(decorators: Set[str]) -> bool:
+            return (
+                any(name in decorators for name in self.b902_classmethod_decorators)
+                or node.name in B902.implicit_classmethods
+            )
+
         if len(self.contexts) < 2 or not isinstance(
             self.contexts[-2].node, ast.ClassDef
         ):
             return
 
         cls = self.contexts[-2].node
-        decorators = NameFinder()
-        decorators.visit(node.decorator_list)
 
-        if "staticmethod" in decorators.names:
+        decorators: set[str] = {
+            self.find_decorator_name(d) for d in node.decorator_list
+        }
+
+        if "staticmethod" in decorators:
             # TODO: maybe warn if the first argument is surprisingly `self` or
             # `cls`?
             return
 
         bases = {b.id for b in cls.bases if isinstance(b, ast.Name)}
         if "type" in bases:
-            if (
-                "classmethod" in decorators.names
-                or node.name in B902.implicit_classmethods
-            ):
+            if is_classmethod(decorators):
                 expected_first_args = B902.metacls
                 kind = "metaclass class"
             else:
                 expected_first_args = B902.cls
                 kind = "metaclass instance"
         else:
-            if (
-                "classmethod" in decorators.names
-                or node.name in B902.implicit_classmethods
-            ):
+            if is_classmethod(decorators):
                 expected_first_args = B902.cls
                 kind = "class"
             else:
@@ -1438,9 +1474,11 @@ class NameFinder(ast.NodeVisitor):
     key is name string, value is the node (useful for location purposes).
     """
 
-    names = attr.ib(default=attr.Factory(dict))
+    names: Dict[str, List[ast.Name]] = attr.ib(default=attr.Factory(dict))
 
-    def visit_Name(self, node):  # noqa: B906 # names don't contain other names
+    def visit_Name(  # noqa: B906 # names don't contain other names
+        self, node: ast.Name
+    ):
         self.names.setdefault(node.id, []).append(node)
 
     def visit(self, node):
