@@ -338,8 +338,15 @@ MIT
 Change Log
 ----------
 
+23.9.16
+~~~~~~~
+
+* add --classmethod-decorators (#405)
+* fix name collision for node_stack on python 3.12 (#406)
+* Use pypa/build to build the package (#404)
+
 23.7.10
-~~~~~~~~~~
+~~~~~~~
 
 * Add B034: re.sub/subn/split must pass flags/count/maxsplit as keyword arguments.
 * Fix a crash and several test failures on Python 3.12, all relating to the B907
