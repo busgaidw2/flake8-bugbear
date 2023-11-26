@@ -547,6 +547,9 @@ class BugBearVisitor(ast.NodeVisitor):
         self.check_for_b005(node)
         self.generic_visit(node)
 
+    def visit_ImportFrom(self, node):
+        self.visit_Import(node)
+
     def visit_Set(self, node):
         self.check_for_b033(node)
         self.generic_visit(node)
@@ -555,6 +558,9 @@ class BugBearVisitor(ast.NodeVisitor):
         if isinstance(node, ast.Import):
             for name in node.names:
                 self._b005_imports.add(name.asname or name.name)
+        elif isinstance(node, ast.ImportFrom):
+            for name in node.names:
+                self._b005_imports.add(f"{node.module}.{name.name or name.asname}")
         elif isinstance(node, ast.Call):
             if node.func.attr not in B005.methods:
                 return  # method name doesn't match
@@ -652,13 +658,25 @@ class BugBearVisitor(ast.NodeVisitor):
 
         if (
             hasattr(item_context, "func")
-            and isinstance(item_context.func, ast.Attribute)
             and (
-                item_context.func.attr == "assertRaises"
+                (
+                    isinstance(item_context.func, ast.Attribute)
+                    and (
+                        item_context.func.attr == "assertRaises"
+                        or (
+                            item_context.func.attr == "raises"
+                            and isinstance(item_context.func.value, ast.Name)
+                            and item_context.func.value.id == "pytest"
+                            and "match"
+                            not in [kwd.arg for kwd in item_context.keywords]
+                        )
+                    )
+                )
                 or (
-                    item_context.func.attr == "raises"
-                    and isinstance(item_context.func.value, ast.Name)
-                    and item_context.func.value.id == "pytest"
+                    isinstance(item_context.func, ast.Name)
+                    and item_context.func.id == "raises"
+                    and isinstance(item_context.func.ctx, ast.Load)
+                    and "pytest.raises" in self._b005_imports
                     and "match" not in [kwd.arg for kwd in item_context.keywords]
                 )
             )
