@@ -1046,7 +1046,7 @@ class BugBearVisitor(ast.NodeVisitor):
             return
 
         bases = {b.id for b in cls.bases if isinstance(b, ast.Name)}
-        if "type" in bases:
+        if any(basetype in bases for basetype in ("type", "ABCMeta", "EnumMeta")):
             if is_classmethod(decorators):
                 expected_first_args = B902.metacls
                 kind = "metaclass class"
