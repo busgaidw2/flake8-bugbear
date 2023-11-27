@@ -340,11 +340,15 @@ MIT
 Change Log
 ----------
 
-Unreleased
-~~~~~~~~~~
+23.11.26
+~~~~~~~~
 
-* B026: Fix bug where the check was not triggered for calls where the callee
-  is an attribute
+* B035: add check for static keys in dict-comprehension (#426)
+* B902: Add exceptions for standard library metaclasses (#415)
+* B017: Modify to no longer have a false negative when raises() is imported
+  directly from pytest (#424)
+* B026: Fix bug where the check was not triggered for calls where the caller
+  is an attribute (#420)
 
 23.9.16
 ~~~~~~~
