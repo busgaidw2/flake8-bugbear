@@ -340,6 +340,11 @@ MIT
 Change Log
 ----------
 
+23.11.28
+~~~~~~~~
+
+* B035: Fix false positive when named expressions are used (#430)
+
 23.11.26
 ~~~~~~~~
 
