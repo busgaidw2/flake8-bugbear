@@ -1,0 +1,18 @@
+name: flake8_py_version_check
+on:
+  workflow_dispatch: {}
+  schedule:
+  # every Sunday at midnight
+  - cron: "0 0 * * 0"
+jobs:
+  check-versions:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.12
+        allow-prereleases: true
+    - name: run script
+      run: python scripts/flake8_py_version_check.py
