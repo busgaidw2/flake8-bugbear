@@ -137,6 +137,9 @@ using ``pytest.raises``), or use the context manager form with a target
 (e.g. ``with self.assertRaises(Exception) as ex:``).
 
 **B018**: Found useless expression. Either assign it to a variable or remove it.
+Note that dangling commas will cause things to be interpreted as useless tuples.
+For example, in the statement ``print(".."),`` is the same as ``(print(".."),)``
+which is an unassigned tuple. Simply remove the comma to clear the error.
 
 **B019**: Use of ``functools.lru_cache`` or ``functools.cache`` on methods
 can lead to memory leaks. The cache may retain instance references, preventing

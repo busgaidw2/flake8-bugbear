@@ -270,6 +270,8 @@ class BugbearTestCase(unittest.TestCase):
         expected = [B018(line, 4) for line in range(15, 25)]
         expected.append(B018(28, 4))
         expected.append(B018(31, 4))
+        expected.append(B018(32, 4))
+        expected.append(B018(33, 4))
         self.assertEqual(errors, self.errors(*expected))
 
     def test_b018_classes(self):
@@ -280,6 +282,8 @@ class BugbearTestCase(unittest.TestCase):
         expected = [B018(line, 4) for line in range(16, 26)]
         expected.append(B018(29, 4))
         expected.append(B018(32, 4))
+        expected.append(B018(33, 4))
+        expected.append(B018(34, 4))
         self.assertEqual(errors, self.errors(*expected))
 
     def test_b018_modules(self):
@@ -287,7 +291,7 @@ class BugbearTestCase(unittest.TestCase):
         bbc = BugBearChecker(filename=str(filename))
         errors = list(bbc.run())
 
-        expected = [B018(line, 0) for line in range(9, 19)]
+        expected = [B018(line, 0) for line in range(9, 21)]
         self.assertEqual(errors, self.errors(*expected))
 
     def test_b019(self):

@@ -29,3 +29,6 @@ def foo3():
     a = 2
     "str"
     3
+    (1,)  # bad
+    (2, 3)  # bad
+    t = (4, 5)  # good
