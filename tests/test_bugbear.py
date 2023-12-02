@@ -267,11 +267,23 @@ class BugbearTestCase(unittest.TestCase):
         bbc = BugBearChecker(filename=str(filename))
         errors = list(bbc.run())
 
-        expected = [B018(line, 4) for line in range(15, 25)]
-        expected.append(B018(28, 4))
-        expected.append(B018(31, 4))
-        expected.append(B018(32, 4))
-        expected.append(B018(33, 4))
+        expected = [
+            B018(15, 4, vars=("Constant",)),
+            B018(16, 4, vars=("Constant",)),
+            B018(17, 4, vars=("Constant",)),
+            B018(18, 4, vars=("Constant",)),
+            B018(19, 4, vars=("Constant",)),
+            B018(20, 4, vars=("Constant",)),
+            B018(21, 4, vars=("Constant",)),
+            B018(22, 4, vars=("List",)),
+            B018(23, 4, vars=("Set",)),
+            B018(24, 4, vars=("Dict",)),
+            B018(28, 4, vars=("Constant",)),
+            B018(31, 4, vars=("Constant",)),
+            B018(32, 4, vars=("Tuple",)),
+            B018(33, 4, vars=("Tuple",)),
+        ]
+
         self.assertEqual(errors, self.errors(*expected))
 
     def test_b018_classes(self):
@@ -279,11 +291,23 @@ class BugbearTestCase(unittest.TestCase):
         bbc = BugBearChecker(filename=str(filename))
         errors = list(bbc.run())
 
-        expected = [B018(line, 4) for line in range(16, 26)]
-        expected.append(B018(29, 4))
-        expected.append(B018(32, 4))
-        expected.append(B018(33, 4))
-        expected.append(B018(34, 4))
+        expected = [
+            B018(16, 4, vars=("Constant",)),
+            B018(17, 4, vars=("Constant",)),
+            B018(18, 4, vars=("Constant",)),
+            B018(19, 4, vars=("Constant",)),
+            B018(20, 4, vars=("Constant",)),
+            B018(21, 4, vars=("Constant",)),
+            B018(22, 4, vars=("Constant",)),
+            B018(23, 4, vars=("List",)),
+            B018(24, 4, vars=("Set",)),
+            B018(25, 4, vars=("Dict",)),
+            B018(29, 4, vars=("Constant",)),
+            B018(32, 4, vars=("Constant",)),
+            B018(33, 4, vars=("Tuple",)),
+            B018(34, 4, vars=("Tuple",)),
+        ]
+
         self.assertEqual(errors, self.errors(*expected))
 
     def test_b018_modules(self):
@@ -291,7 +315,20 @@ class BugbearTestCase(unittest.TestCase):
         bbc = BugBearChecker(filename=str(filename))
         errors = list(bbc.run())
 
-        expected = [B018(line, 0) for line in range(9, 21)]
+        expected = [
+            B018(9, 0, vars=("Constant",)),
+            B018(10, 0, vars=("Constant",)),
+            B018(11, 0, vars=("Constant",)),
+            B018(12, 0, vars=("Constant",)),
+            B018(13, 0, vars=("Constant",)),
+            B018(14, 0, vars=("Constant",)),
+            B018(15, 0, vars=("Constant",)),
+            B018(16, 0, vars=("List",)),
+            B018(17, 0, vars=("Set",)),
+            B018(18, 0, vars=("Dict",)),
+            B018(19, 0, vars=("Tuple",)),
+            B018(20, 0, vars=("Tuple",)),
+        ]
         self.assertEqual(errors, self.errors(*expected))
 
     def test_b019(self):

@@ -1182,7 +1182,13 @@ class BugBearVisitor(ast.NodeVisitor):
                     or subnode.value.value is None
                 )
             ):
-                self.errors.append(B018(subnode.lineno, subnode.col_offset))
+                self.errors.append(
+                    B018(
+                        subnode.lineno,
+                        subnode.col_offset,
+                        vars=(subnode.value.__class__.__name__,),
+                    )
+                )
 
     def check_for_b021(self, node):
         if (
@@ -1835,7 +1841,7 @@ B017 = Error(
 )
 B018 = Error(
     message=(
-        "B018 Found useless expression. Consider either assigning it to a "
+        "B018 Found useless {} expression. Consider either assigning it to a "
         "variable or removing it."
     )
 )
