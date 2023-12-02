@@ -331,6 +331,27 @@ class BugbearTestCase(unittest.TestCase):
         ]
         self.assertEqual(errors, self.errors(*expected))
 
+    def test_b018_nested(self):
+        filename = Path(__file__).absolute().parent / "b018_nested.py"
+        bbc = BugBearChecker(filename=str(filename))
+        errors = list(bbc.run())
+
+        expected = [
+            B018(3, 0, vars=("Constant",)),
+            B018(8, 4, vars=("Constant",)),
+            B018(14, 4, vars=("List",)),
+            B018(18, 8, vars=("Tuple",)),
+            B018(22, 12, vars=("Constant",)),
+            B018(25, 16, vars=("Constant",)),
+            B018(28, 20, vars=("Set",)),
+            B018(31, 20, vars=("Set",)),
+            B018(34, 20, vars=("Set",)),
+            B018(36, 24, vars=("Constant",)),
+            B018(40, 24, vars=("Constant",)),
+            B018(42, 24, vars=("Constant",)),
+        ]
+        self.assertEqual(errors, self.errors(*expected))
+
     def test_b019(self):
         filename = Path(__file__).absolute().parent / "b019.py"
         bbc = BugBearChecker(filename=str(filename))

@@ -370,6 +370,8 @@ class BugBearVisitor(ast.NodeVisitor):
         if is_contextful:
             self.contexts.pop()
 
+        self.check_for_b018(node)
+
     def visit_ExceptHandler(self, node):
         if node.type is None:
             self.errors.append(B001(node.lineno, node.col_offset))
@@ -447,7 +449,6 @@ class BugBearVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_Module(self, node):
-        self.check_for_b018(node)
         self.generic_visit(node)
 
     def visit_Assign(self, node):
@@ -503,7 +504,6 @@ class BugBearVisitor(ast.NodeVisitor):
         self.check_for_b901(node)
         self.check_for_b902(node)
         self.check_for_b006_and_b008(node)
-        self.check_for_b018(node)
         self.check_for_b019(node)
         self.check_for_b021(node)
         self.check_for_b906(node)
@@ -511,7 +511,6 @@ class BugBearVisitor(ast.NodeVisitor):
 
     def visit_ClassDef(self, node):
         self.check_for_b903(node)
-        self.check_for_b018(node)
         self.check_for_b021(node)
         self.check_for_b024_and_b027(node)
         self.generic_visit(node)
@@ -1164,31 +1163,30 @@ class BugBearVisitor(ast.NodeVisitor):
         self.errors.append(B903(node.lineno, node.col_offset))
 
     def check_for_b018(self, node):
-        for subnode in node.body:
-            if not isinstance(subnode, ast.Expr):
-                continue
-            if isinstance(
-                subnode.value,
-                (
-                    ast.List,
-                    ast.Set,
-                    ast.Dict,
-                    ast.Tuple,
-                ),
-            ) or (
-                isinstance(subnode.value, ast.Constant)
-                and (
-                    isinstance(subnode.value.value, (int, float, complex, bytes, bool))
-                    or subnode.value.value is None
+        if not isinstance(node, ast.Expr):
+            return
+        if isinstance(
+            node.value,
+            (
+                ast.List,
+                ast.Set,
+                ast.Dict,
+                ast.Tuple,
+            ),
+        ) or (
+            isinstance(node.value, ast.Constant)
+            and (
+                isinstance(node.value.value, (int, float, complex, bytes, bool))
+                or node.value.value is None
+            )
+        ):
+            self.errors.append(
+                B018(
+                    node.lineno,
+                    node.col_offset,
+                    vars=(node.value.__class__.__name__,),
                 )
-            ):
-                self.errors.append(
-                    B018(
-                        subnode.lineno,
-                        subnode.col_offset,
-                        vars=(subnode.value.__class__.__name__,),
-                    )
-                )
+            )
 
     def check_for_b021(self, node):
         if (
