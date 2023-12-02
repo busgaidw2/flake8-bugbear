@@ -343,6 +343,13 @@ MIT
 Change Log
 ----------
 
+23.12.2
+~~~~~~~
+
+* B018: to detect useless-statements at all levels (#434)
+* B018: Add classname to b018 useless-expression output (#433)
+* B018: Include tuples in b018 useless-statement check (#432)
+
 23.11.28
 ~~~~~~~~
 
