@@ -41,7 +41,7 @@ try:
     pass
 except (MyError, BaseException) as e:
     # But we *can* assume that everything is a subclass of BaseException
-    pass
+    raise e
 
 
 try:

@@ -195,6 +195,8 @@ second usage. Save the result to a list if the result is needed multiple times.
 
 **B035**: Found dict comprehension with a static key - either a constant value or variable not from the comprehension expression. This will result in a dict with a single key that was repeatedly overwritten.
 
+**B036**: Found ``except BaseException:`` without re-raising (no ``raise`` in the top-level of the ``except`` block). This catches all kinds of things (Exception, SystemExit, KeyboardInterrupt...) and may prevent a program from exiting as expected.
+
 Opinionated warnings
 ~~~~~~~~~~~~~~~~~~~~
 

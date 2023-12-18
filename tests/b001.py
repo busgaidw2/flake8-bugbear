@@ -23,13 +23,13 @@ except (KeyError, IndexError):
 
 try:
     pass
-except BaseException as be:
+except ValueError as be:
     # no warning here, all good
     pass
 
 try:
     pass
-except BaseException:
+except IndexError:
     # no warning here, all good
     pass
 

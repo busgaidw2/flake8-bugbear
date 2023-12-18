@@ -324,6 +324,31 @@ def _typesafe_issubclass(cls, class_or_tuple):
         return False
 
 
+class ExceptBaseExceptionVisitor(ast.NodeVisitor):
+    def __init__(self, except_node: ast.ExceptHandler) -> None:
+        super().__init__()
+        self.root = except_node
+        self._re_raised = False
+
+    def re_raised(self) -> bool:
+        self.visit(self.root)
+        return self._re_raised
+
+    def visit_Raise(self, node: ast.Raise):
+        """If we find a corresponding `raise` or `raise e` where e was from
+        `except BaseException as e:` then we mark re_raised as True and can
+        stop scanning."""
+        if node.exc is None or node.exc.id == self.root.name:
+            self._re_raised = True
+            return
+        return super().generic_visit(node)
+
+    def visit_ExceptHandler(self, node: ast.ExceptHandler):
+        if node is not self.root:
+            return  # entered a nested except - stop searching
+        return super().generic_visit(node)
+
+
 @attr.s
 class BugBearVisitor(ast.NodeVisitor):
     filename = attr.ib()
@@ -407,6 +432,12 @@ class BugBearVisitor(ast.NodeVisitor):
             maybe_error = _check_redundant_excepthandlers(names, node)
             if maybe_error is not None:
                 self.errors.append(maybe_error)
+        if (
+            "BaseException" in names
+            and not ExceptBaseExceptionVisitor(node).re_raised()
+        ):
+            self.errors.append(B036(node.lineno, node.col_offset))
+
         self.generic_visit(node)
 
     def visit_UAdd(self, node):
@@ -668,7 +699,7 @@ class BugBearVisitor(ast.NodeVisitor):
                             and isinstance(item_context.func.value, ast.Name)
                             and item_context.func.value.id == "pytest"
                             and "match"
-                            not in [kwd.arg for kwd in item_context.keywords]
+                            not in (kwd.arg for kwd in item_context.keywords)
                         )
                     )
                 )
@@ -677,7 +708,7 @@ class BugBearVisitor(ast.NodeVisitor):
                     and item_context.func.id == "raises"
                     and isinstance(item_context.func.ctx, ast.Load)
                     and "pytest.raises" in self._b005_imports
-                    and "match" not in [kwd.arg for kwd in item_context.keywords]
+                    and "match" not in (kwd.arg for kwd in item_context.keywords)
                 )
             )
             and len(item_context.args) == 1
@@ -1671,8 +1702,8 @@ B001 = Error(
     message=(
         "B001 Do not use bare `except:`, it also catches unexpected "
         "events like memory errors, interrupts, system exit, and so on.  "
-        "Prefer `except Exception:`.  If you're sure what you're doing, "
-        "be explicit and write `except BaseException:`."
+        "Prefer excepting specific exceptions  If you're sure what you're "
+        "doing, be explicit and write `except BaseException:`."
     )
 )
 
@@ -1953,6 +1984,9 @@ B034 = Error(
 )
 B035 = Error(message="B035 Static key in dict comprehension {!r}.")
 
+B036 = Error(
+    message="B036 Don't except `BaseException` unless you plan to re-raise it."
+)
 
 # Warnings disabled by default.
 B901 = Error(
