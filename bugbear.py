@@ -713,7 +713,7 @@ class BugBearVisitor(ast.NodeVisitor):
             )
             and len(item_context.args) == 1
             and isinstance(item_context.args[0], ast.Name)
-            and item_context.args[0].id == "Exception"
+            and item_context.args[0].id in {"Exception", "BaseException"}
             and not item.optional_vars
         ):
             self.errors.append(B017(node.lineno, node.col_offset))
