@@ -197,6 +197,7 @@ second usage. Save the result to a list if the result is needed multiple times.
 
 **B036**: Found ``except BaseException:`` without re-raising (no ``raise`` in the top-level of the ``except`` block). This catches all kinds of things (Exception, SystemExit, KeyboardInterrupt...) and may prevent a program from exiting as expected.
 
+**B037**: Found ``return <value>``, ``yield``, ``yield <value>``, or ``yield from <value>`` in class ``__init__()`` method. No values should be returned or yielded, only bare ``return``s are ok.
 Opinionated warnings
 ~~~~~~~~~~~~~~~~~~~~
 

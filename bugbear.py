@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import ast
 import builtins
 import itertools
@@ -379,6 +381,30 @@ class BugBearVisitor(ast.NodeVisitor):
         context, stack = self.contexts[-1]
         return stack
 
+    def in_class_init(self) -> bool:
+        return (
+            len(self.contexts) >= 2
+            and isinstance(self.contexts[-2].node, ast.ClassDef)
+            and isinstance(self.contexts[-1].node, ast.FunctionDef)
+            and self.contexts[-1].node.name == "__init__"
+        )
+
+    def visit_Return(self, node: ast.Return) -> None:
+        if self.in_class_init():
+            if node.value is not None:
+                self.errors.append(B037(node.lineno, node.col_offset))
+        self.generic_visit(node)
+
+    def visit_Yield(self, node: ast.Yield) -> None:
+        if self.in_class_init():
+            self.errors.append(B037(node.lineno, node.col_offset))
+        self.generic_visit(node)
+
+    def visit_YieldFrom(self, node: ast.YieldFrom) -> None:
+        if self.in_class_init():
+            self.errors.append(B037(node.lineno, node.col_offset))
+        self.generic_visit(node)
+
     def visit(self, node):
         is_contextful = isinstance(node, CONTEXTFUL_NODES)
 
@@ -540,7 +566,7 @@ class BugBearVisitor(ast.NodeVisitor):
         self.check_for_b906(node)
         self.generic_visit(node)
 
-    def visit_ClassDef(self, node):
+    def visit_ClassDef(self, node: ast.ClassDef):
         self.check_for_b903(node)
         self.check_for_b021(node)
         self.check_for_b024_and_b027(node)
@@ -1984,6 +2010,10 @@ B035 = Error(message="B035 Static key in dict comprehension {!r}.")
 
 B036 = Error(
     message="B036 Don't except `BaseException` unless you plan to re-raise it."
+)
+
+B037 = Error(
+    message="B037 Class `__init__` methods must not return or yield and any values."
 )
 
 # Warnings disabled by default.
