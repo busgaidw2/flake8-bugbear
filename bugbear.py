@@ -237,6 +237,7 @@ def _flatten_excepthandler(node):
         ):
             expr_list.extend(expr.value.elts)
             continue
+
         yield expr
 
 
@@ -521,6 +522,7 @@ class BugBearVisitor(ast.NodeVisitor):
         self.check_for_b020(node)
         self.check_for_b023(node)
         self.check_for_b031(node)
+        self.check_for_b038(node)
         self.generic_visit(node)
 
     def visit_AsyncFor(self, node):
@@ -1570,6 +1572,18 @@ class BugBearVisitor(ast.NodeVisitor):
         elif node.func.attr == "split":
             check(2, "maxsplit")
 
+    def check_for_b038(self, node: ast.For):
+        if isinstance(node.iter, ast.Name):
+            name = _to_name_str(node.iter)
+        elif isinstance(node.iter, ast.Attribute):
+            name = _to_name_str(node.iter)
+        else:
+            return
+        checker = B038Checker(name)
+        checker.visit(node.body)
+        for mutation in checker.mutations:
+            self.errors.append(B038(mutation.lineno, mutation.col_offset))
+
 
 def compose_call_path(node):
     if isinstance(node, ast.Attribute):
@@ -1579,6 +1593,49 @@ def compose_call_path(node):
         yield from compose_call_path(node.func)
     elif isinstance(node, ast.Name):
         yield node.id
+
+
+class B038Checker(ast.NodeVisitor):
+    def __init__(self, name: str):
+        self.name = name
+        self.mutations = []
+
+    def visit_Delete(self, node: ast.Delete):
+        for target in node.targets:
+            if isinstance(target, ast.Subscript):
+                name = _to_name_str(target.value)
+            elif isinstance(target, (ast.Attribute, ast.Name)):
+                name = _to_name_str(target)
+            else:
+                name = ""  # fallback
+                self.generic_visit(target)
+
+            if name == self.name:
+                self.mutations.append(node)
+
+    def visit_Call(self, node: ast.Call):
+        if isinstance(node.func, ast.Attribute):
+            name = _to_name_str(node.func.value)
+            function_object = name
+
+            if function_object == self.name:
+                self.mutations.append(node)
+
+        self.generic_visit(node)
+
+    def visit_Name(self, node: ast.Name):
+        if isinstance(node.ctx, ast.Del):
+            self.mutations.append(node)
+        self.generic_visit(node)
+
+    def visit(self, node):
+        """Like super-visit but supports iteration over lists."""
+        if not isinstance(node, list):
+            return super().visit(node)
+
+        for elem in node:
+            super().visit(elem)
+        return node
 
 
 @attr.s
@@ -2075,6 +2132,12 @@ B908 = Error(
         " statement."
     )
 )
+
 B950 = Error(message="B950 line too long ({} > {} characters)")
 
+B038 = Error(
+    message=(
+        "B038 editing a loop's mutable iterable often leads to unexpected results/bugs"
+    )
+)
 disabled_by_default = ["B901", "B902", "B903", "B904", "B905", "B906", "B908", "B950"]
