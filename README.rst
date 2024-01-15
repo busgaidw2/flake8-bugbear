@@ -350,6 +350,14 @@ MIT
 Change Log
 ----------
 
+23.1.15
+~~~~~~~
+
+* B038: Add check for mutations of loop iterator (#446)
+* B037: Add check for yielding or returning values in __init__() (#442)
+* B017: make B017 also apply to BaseException (#439)
+* B036: Add check for except BaseException without re-raising (#438)
+
 23.12.2
 ~~~~~~~
 
