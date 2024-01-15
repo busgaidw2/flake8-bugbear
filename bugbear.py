@@ -1623,11 +1623,6 @@ class B038Checker(ast.NodeVisitor):
 
         self.generic_visit(node)
 
-    def visit_Name(self, node: ast.Name):
-        if isinstance(node.ctx, ast.Del):
-            self.mutations.append(node)
-        self.generic_visit(node)
-
     def visit(self, node):
         """Like super-visit but supports iteration over lists."""
         if not isinstance(node, list):

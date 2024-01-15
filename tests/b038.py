@@ -16,6 +16,7 @@ for elem in some_list:
     print(elem)
     if elem % 2 == 0:
         some_other_list.remove(elem)  # should not error
+        del some_other_list
 
 
 some_list = [1, 2, 3]

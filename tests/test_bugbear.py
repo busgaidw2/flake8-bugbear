@@ -976,10 +976,10 @@ class BugbearTestCase(unittest.TestCase):
         print(errors)
         expected = [
             B038(11, 8),
-            B038(25, 8),
             B038(26, 8),
-            B038(40, 8),
-            B038(46, 8),
+            B038(27, 8),
+            B038(41, 8),
+            B038(47, 8),
         ]
         self.assertEqual(errors, self.errors(*expected))
 
