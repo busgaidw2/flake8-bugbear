@@ -350,7 +350,7 @@ MIT
 Change Log
 ----------
 
-23.1.15
+24.1.15
 ~~~~~~~
 
 * B038: Add check for mutations of loop iterator (#446)
