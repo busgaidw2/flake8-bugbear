@@ -3,7 +3,10 @@ name: rst_check
 on: [push, pull_request]
 
 jobs:
-  build:
+  check_syntax:
+    name: RST Syntax Check
+    runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v4
 
