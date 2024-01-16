@@ -349,10 +349,10 @@ MIT
 Change Log
 ----------
 
-Unreleased
-~~~~~~~~~~
+24.1.16
+~~~~~~~
 
-* B036: Fix crash on `raise` statements raising something other than
+* B036: Fix crash on ``raise`` statements raising something other than
   a bare name (#450)
 
 24.1.15
