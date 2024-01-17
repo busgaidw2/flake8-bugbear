@@ -981,6 +981,15 @@ class BugbearTestCase(unittest.TestCase):
             B038(27, 8),
             B038(41, 8),
             B038(47, 8),
+            B038(56, 8),
+            B038(57, 8),
+            B038(58, 8),
+            B038(59, 8),
+            B038(60, 8),
+            B038(61, 8),
+            B038(62, 8),
+            B038(63, 8),
+            B038(74, 8),
         ]
         self.assertEqual(errors, self.errors(*expected))
 

@@ -1598,6 +1598,19 @@ def compose_call_path(node):
 
 
 class B038Checker(ast.NodeVisitor):
+    # https://docs.python.org/3/library/stdtypes.html#mutable-sequence-types
+    MUTATING_FUNCTIONS = (
+        "append",
+        "sort",
+        "reverse",
+        "remove",
+        "clear",
+        "extend",
+        "insert",
+        "pop",
+        "popitem",
+    )
+
     def __init__(self, name: str):
         self.name = name
         self.mutations = []
@@ -1619,8 +1632,12 @@ class B038Checker(ast.NodeVisitor):
         if isinstance(node.func, ast.Attribute):
             name = _to_name_str(node.func.value)
             function_object = name
+            function_name = node.func.attr
 
-            if function_object == self.name:
+            if (
+                function_object == self.name
+                and function_name in self.MUTATING_FUNCTIONS
+            ):
                 self.mutations.append(node)
 
         self.generic_visit(node)

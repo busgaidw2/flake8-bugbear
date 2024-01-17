@@ -45,3 +45,31 @@ for elem in a.some_list:
     print(elem)
     if elem % 2 == 0:
         del a.some_list[2]  # should error
+
+
+
+some_list = [1, 2, 3]
+for elem in some_list:
+    print(elem)
+    if elem == 2:
+        found_idx = some_list.index(elem)  # should not error
+        some_list.append(elem)  # should error
+        some_list.sort()  # should error
+        some_list.reverse()  # should error
+        some_list.clear()  # should error
+        some_list.extend([1,2])  # should error
+        some_list.insert(1, 1)  # should error
+        some_list.pop(1) # should error
+        some_list.pop() # should error
+        some_list = 3 # should error
+        break
+
+
+
+mydicts = {'a': {'foo': 1, 'bar': 2}}
+
+for mydict in mydicts:
+    if mydicts.get('a', ''):
+        print(mydict['foo'])  # should not error
+        mydicts.popitem() # should error
+        
