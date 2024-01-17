@@ -349,6 +349,11 @@ MIT
 Change Log
 ----------
 
+24.1.17
+~~~~~~~
+
+* B038: Restrict rule to mutation functions only (#453)
+
 24.1.16
 ~~~~~~~
 
